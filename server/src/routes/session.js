@@ -341,6 +341,21 @@ class SessionManager extends TableManager {
         let playerName = this.getPlayerById(playerId);
         await this.playerLeaves(playerId);
     }
+    async setPlayerGolleNumbers(playerName, values) {
+        let didSet = super.setPlayerGolleNumbers(playerName, values);
+        if (didSet) {
+            this.sendTableState();
+            await this.addToGameLog('action', {
+                action: 'setGolleNumbers',
+                playerName: playerName,
+                values: values.join(','),
+            },{
+                action: 'setGolleNumbers',
+                playerName: playerName,
+            });
+        }
+        return didSet;
+    }
     async setPlayerSeed(playerName, value) {
         value = value.trim();
         let setSeed = super.setPlayerSeed(playerName, value);
@@ -715,6 +730,14 @@ async function handleOnAuth(s, socket) {
         p.showHand();
         s.sendTableState();
     });
+
+    const setGolleNumbersSchema = Joi.object({
+        values: Joi.array(Joi.number().integer().min(0).max(51))
+    }).external(isSeatedPlayerIdValidator);
+    socket.on('setGolleNumbers', asyncSchemaValidator(setGolleNumbersSchema, async ({values}) => {
+        const playerName = s.getPlayerById(playerId);
+        await s.setPlayerGolleNumbers(playerName, values);
+    }))
 
     const setSeedSchema = Joi.object({
         value: Joi.string().trim().min(1).max(51).external(xss).required()

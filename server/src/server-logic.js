@@ -292,6 +292,14 @@ class TableManager extends TableStateManager {
         }
         return false;
     }
+    setPlayerGolleNumbers(playerName, values) {
+        const p = this.table.getPlayer(playerName);
+        if (p) {
+            p.golleNumbers = values;
+            return true;
+        }
+        return false;
+    }
 
     removePlayer(playerName) {
         this.table.removePlayer(playerName);

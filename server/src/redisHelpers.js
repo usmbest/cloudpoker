@@ -55,9 +55,13 @@ module.exports.getGameStream = getGameStream;
 const sha256Hash = (str) => crypto.createHash('sha256').update(str).digest('hex');
 const transformLogStreamElement = (el) => {
     delete el.type;
-    if (el.logEvent === 'action' && el.action === 'setSeed') {
-        el.playerSeedHash = sha256Hash(el.value);
-        delete el.value;
+    if (el.logEvent === 'action') {
+        if (el.action === 'setSeed') {
+            el.playerSeedHash = sha256Hash(el.value);
+            delete el.value;
+        } else if (el.action === 'setGolleNumbers') {
+            delete el.values;
+        }
     }
     return el;
 }
@@ -124,6 +128,8 @@ async function getTableState(sid, gameId) {
             if (!(el.type === 'log' && el.logEvent === 'action')) continue;
             if (el.action === 'setSeed') {
                 table.allPlayers[i][el.seat].seed = el.value;
+            } else if (el.action === 'setGolleNumbers') {
+                table.allPlayers[i][el.seat].golleNumbers = el.values.split(',').map(parseInt);
             } else {
                 prev_round = table.game.roundName.toLowerCase();
                 table.applyAction(el.seat, el.action, el.amount || 0);
@@ -207,6 +213,7 @@ const addPlayerArgs = (table, sid, p) => {
         'isStraddling', p.isStraddling,
         'seat', p.seat,
         'seed', p.seed,
+        'golleNumbers', p.golleNumbers.join(','),
     ];
     return args;
 }

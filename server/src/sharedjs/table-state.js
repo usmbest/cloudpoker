@@ -292,7 +292,7 @@ class Player {
      * @param isStraddling If the player wants to straddle
      * @constructor
      */
-    constructor(playerName, chips, isStraddling, seat, isMod, seed) {
+    constructor(playerName, chips, isStraddling, seat, isMod, seed, golleNumbers) {
         this.playerName = playerName;
         this.chips = chips;
         this.checked = false;
@@ -314,6 +314,8 @@ class Player {
         this.cards = [];
         console.log('initialized seed for', playerName, 'to', seed);
         this.seed = seed;
+        this.golleNumbers = golleNumbers || null;
+        // this.nextRandomNumber = nextRandomNumber || null;
     }
 
     showHand() {
@@ -329,6 +331,7 @@ class Player {
         this.allIn = false;
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
+        this.golleNumbers = null;
     }
 
     get isWaiting() {
