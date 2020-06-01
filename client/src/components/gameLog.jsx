@@ -64,7 +64,7 @@ export default class GameLog extends Component {
         }
         this.props.socket.emit('get-game-log', {cursor: 0});
 
-        const logWindow = document.getElementById('game-log-text');
+        const logWindow = document.getElementById('game-log');
         logWindow.scrollTo({top: logWindow.scrollHeight, behavior: 'smooth'});
     }
     componentWillUnmount() {
@@ -86,7 +86,7 @@ export default class GameLog extends Component {
             document.removeEventListener('keydown', this.handleKeyDown);
         }
 
-        const logWindow = document.getElementById('game-log-text');
+        const logWindow = document.getElementById('game-log');
         logWindow.scrollTo({top: logWindow.scrollHeight, behavior: 'smooth'});
     }
     render() {
