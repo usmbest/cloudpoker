@@ -372,7 +372,9 @@ class SessionManager extends TableManager {
         // }
         let prev_round = super.getRoundName();
         this.table.standUpPlayer(playerName);
-        await this.check_round(prev_round);
+        if (this.table.game)
+            await this.check_round(prev_round);
+        this.sendTableState();
     }
     async sitDownPlayer(playerName) {
         if (!this.isPlayerStandingUp(playerName)) return;
