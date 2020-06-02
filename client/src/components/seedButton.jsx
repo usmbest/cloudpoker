@@ -72,7 +72,7 @@ class SeedInfo extends Component {
 }
 
 
-export default class RngButton extends Component {
+export default class SeedButton extends Component {
     constructor(props) {
         super(props);
         this.state = {showInfo: false};
