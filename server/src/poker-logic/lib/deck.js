@@ -6,22 +6,7 @@ const makeOrderedDeck = (deck) => {
             deck.push(rank + suit);
     return deck;
 }
-function fillDeck(deck, rng) {
-    makeOrderedDeck(deck);
-    rng = rng || Math.random;
-
-    //Shuffle the deck array with Fisher-Yates
-    var i, j, tempi, tempj;
-    for (i = 0; i < deck.length; i += 1) {
-        j = Math.floor(rng() * (i + 1));
-        tempi = deck[i];
-        tempj = deck[j];
-        deck[i] = tempj;
-        deck[j] = tempi;
-    }
-    return deck;
-}
-module.exports.fillDeck = fillDeck;
+module.exports.makeOrderedDeck = makeOrderedDeck;
 function rankKickers(ranks, noOfCards) {
     var i, kickerRank, myRanks, rank;
 
