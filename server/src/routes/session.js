@@ -732,7 +732,7 @@ async function handleOnAuth(s, socket) {
     });
 
     const setGolleNumbersSchema = Joi.object({
-        values: Joi.array(Joi.number().integer().min(0).max(51))
+        values: Joi.array().items(Joi.number().integer().min(0).max(51))
     }).external(isSeatedPlayerIdValidator);
     socket.on('setGolleNumbers', asyncSchemaValidator(setGolleNumbersSchema, async ({values}) => {
         const playerName = s.getPlayerById(playerId);
