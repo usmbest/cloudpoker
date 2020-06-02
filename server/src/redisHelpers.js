@@ -119,7 +119,6 @@ async function getTableState(sid, gameId) {
     let prev_round = null;
     if (gameId !== 'none') {
         table.dealer = (table.dealer - 1) % table.players.length;
-        table.setRng(table.getSeed(), rngState);
         table.initNewRound();
         table.game.id = gameId;
         // sync actions
@@ -127,6 +126,7 @@ async function getTableState(sid, gameId) {
             let el = gameStream[i];
             if (!(el.type === 'log' && el.logEvent === 'action')) continue;
             if (el.action === 'setSeed') {
+                // TODO: shouldn't this be table.allPlayers[el.seat].seed, without [i]?
                 table.allPlayers[i][el.seat].seed = el.value;
             } else if (el.action === 'setGolleNumbers') {
                 table.allPlayers[i][el.seat].golleNumbers = el.values.split(',').map(parseInt);
