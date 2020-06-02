@@ -314,8 +314,19 @@ class Player {
         this.cards = [];
         console.log('initialized seed for', playerName, 'to', seed);
         this.seed = seed;
-        this.golleNumbers = golleNumbers || null;
+        this._golleNumbers = golleNumbers || null;
         // this.nextRandomNumber = nextRandomNumber || null;
+    }
+
+    get golleNumbers() {
+        if (!this._golleNumbers || this._golleNumbers.length < 1) {
+            this._golleNumbers = [Math.floor(Math.random() * 52)];
+        }
+        return this._golleNumbers;
+    }
+
+    set golleNumbers(v) {
+        this._golleNumbers = v;
     }
 
     showHand() {
@@ -331,7 +342,6 @@ class Player {
         this.allIn = false;
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
-        this.golleNumbers = null;
     }
 
     get isWaiting() {
