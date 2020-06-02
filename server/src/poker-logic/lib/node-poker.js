@@ -1,5 +1,6 @@
 // var events = require('events');
-const {fillDeck, rankHandInt, rankHand} = require('./deck');
+const {makeOrderedDeck} = require("./deck");
+const {rankHandInt, rankHand} = require('./deck');
 const {TableState, Player, GameState} = require('../../sharedjs');
 
 //Note: methods I've changed/created have been commented: EDITED
@@ -141,11 +142,11 @@ class Table extends TableState{
             return;
         }
         this.dealer = (this.dealer + 1) % this.players.length;
-        this.game = new Game(this.smallBlind, this.bigBlind, this.updateRng());
+        this.game = new Game(this.smallBlind, this.bigBlind);
 
         //Deal 2 cards to each player
         for (let i = 0; i < this.players.length; i += 1) {
-            this.players[i].cards.push(this.game.deck.pop(), this.game.deck.pop());
+            this.players[i].cards.push(this.nextCard(), this.nextCard());
             this.players[i].bet = 0;
             this.game.roundBets[i] = 0;
         }
@@ -259,7 +260,6 @@ class Table extends TableState{
         }
         this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
     };
-
     postBlind(blindAmount) {
         const otherPlayersMaxStack = maxSkippingIndices(this.players.map(x => x.bet + x.chips), this.currentPlayer);
         const p = this.players[this.currentPlayer];
@@ -268,6 +268,21 @@ class Table extends TableState{
         p.talked = false;
         return betAmount;
     };
+    nextGolleSum() {
+        const sumReducer = (accumulator, currentValue) => accumulator + currentValue;
+        return this.players
+            // pop the last golleNumber or, if p.golleNumbers is empty, generate an integer in [0, 51].
+            .map(p => p.golleNumbers.pop() || Math.floor(Math.random() * 52))
+            // sum the golle numbers and modulo them
+            .reduce(sumReducer) % 52;
+    }
+    nextCard() {
+        let cardIndex = this.nextGolleSum();
+        while (this.game.isCardUsed(cardIndex)) {
+            cardIndex = this.nextGolleSum();
+        }
+        return this.game.useCard(cardIndex);
+    }
 }
 
 // returns true if the next street should be dealt or the round is over.
@@ -465,22 +480,28 @@ function progress(table) {
 
 // count is the amount of cards to turn.for flop, should be 3. for turn and river, 1.
 function turnCards(table, count) {
-    table.game.deck.pop(); //Burn a card
     for (let i = 0; i < count; i += 1) { //Turn a card <count> times
-        table.game.board.push(table.game.deck.pop());
+        table.game.board.push(table.nextCard());
     }
     for (let i = 0; i < table.players.length; i += 1) {
         table.players[i].talked = false;
         table.players[i].checked = false;
         table.players[i].bet = 0;
     }
-    // table.eventEmitter.emit( "deal" );
 }
 
+const ORDERED_DECK = makeOrderedDeck([]);
 class Game extends GameState {
-    constructor(smallBlind, bigBlind, rng) {
+    constructor(smallBlind, bigBlind) {
         super(smallBlind, bigBlind);
-        this.deck = fillDeck([], rng);
+        this.usedCards = []; // set of numbers representing cards
+    }
+    isCardUsed(i) {
+        return this.usedCards.includes(i);
+    }
+    useCard(i) {
+        this.usedCards.push(i);
+        return ORDERED_DECK[i];
     }
 }
 
