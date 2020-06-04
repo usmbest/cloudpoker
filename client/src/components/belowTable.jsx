@@ -3,6 +3,7 @@ import BuyInLog from "./buyInLog";
 import GameLog from "./gameLog";
 import ChatRoomContainer from "./chatRoomContainer";
 import Actions from "./actions";
+import GolleInput from "./golleInput";
 // import HandHistory from "./handHistory";
 
 export default class BelowTable extends Component {
@@ -60,6 +61,7 @@ export default class BelowTable extends Component {
     buttonsAboveChatroom() {
         return (
             <div id="buttons-above-chatroom">
+                <a onClick={this.openLog} className="button" id="rng-settings-opn">RNG Settings</a>
                 <a onClick={this.openLog} className="button" id="game-log-opn">Log</a>
                 <a onClick={this.openLog} className="button" id="buyin-log-opn">Buy-ins</a>
                 {/*<a onClick={this.openLog} className="button" id="hand-his-log-opn">Hand History</a>*/}
@@ -71,6 +73,7 @@ export default class BelowTable extends Component {
         let actionData = this.props.manager.getAvailableActions(this.props.player? this.props.player.playerName: undefined);
         return (
             <div className="below-table u-full-width">
+                <GolleInput onClose={this.closeLog}/>
                 <BuyInLog buyInData={this.state.buyInData} onClose={this.closeLog} width={this.state.openLogId === 'buyin-log-opn'? "100%": "0%"}/>
                 <GameLog onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn' ? "100%": "0%"} volumeOn={this.props.volumeOn} socket={this.props.socket}/>
                 {/*<HandHistory handEndLog={this.props.handEndLog} onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn'? "100%": "0%"}/>*/}
