@@ -234,7 +234,7 @@ async function initializeGameRedis(table, sid, multi) {
     let startTime = Date.now();
     await setInitialGameState(multi, table, sid, startTime);
     setInitialPlayerStates(multi, table, sid);
-    setRngState(multi, table, sid);
+    // setRngState(multi, table, sid);
 
     await trimGameList(multi, sid, 40);
 
