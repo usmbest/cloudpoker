@@ -319,8 +319,11 @@ class Player {
     }
 
     get golleNumbers() {
-        if (!this._golleNumbers || this._golleNumbers.length < 1) {
-            this._golleNumbers = [Math.floor(Math.random() * 52)];
+        if (!this._golleNumbers || this._golleNumbers.length < 4) {
+            this._golleNumbers = [];
+            for (let i = 0; i < 4; i++) {
+                this._golleNumbers.push(Math.floor(Math.random() * 52));
+            }
         }
         return this._golleNumbers;
     }

@@ -353,6 +353,9 @@ class SessionManager extends TableManager {
                 action: 'setGolleNumbers',
                 playerName: playerName,
             });
+        } else {
+            // u
+            this.sendTableStateTo(this.getSocketId(this.getPlayerId(playerName)), playerName);
         }
         return didSet;
     }
