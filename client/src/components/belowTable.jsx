@@ -73,7 +73,7 @@ export default class BelowTable extends Component {
         let actionData = this.props.manager.getAvailableActions(this.props.player? this.props.player.playerName: undefined);
         return (
             <div className="below-table u-full-width">
-                <GolleInput onClose={this.closeLog}/>
+                {this.props.player && <GolleInput values={this.props.player.golleNumbers} socket={this.props.socket}/>}
                 <BuyInLog buyInData={this.state.buyInData} onClose={this.closeLog} width={this.state.openLogId === 'buyin-log-opn'? "100%": "0%"}/>
                 <GameLog onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn' ? "100%": "0%"} volumeOn={this.props.volumeOn} socket={this.props.socket}/>
                 {/*<HandHistory handEndLog={this.props.handEndLog} onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn'? "100%": "0%"}/>*/}
