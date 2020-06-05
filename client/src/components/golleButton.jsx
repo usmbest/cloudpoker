@@ -1,70 +1,100 @@
 import React, {Component} from "react";
+import GolleNumberInput from "./golleNumberInput";
 
 class GolleInfo extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            nextSeedValue: '',
-        }
-        this.handleInputChange = this.handleInputChange.bind(this);
+        this.state = {values: this.newValues(), justUpdated: false}
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    handleInputChange(event) {
-        const target = event.target;
-
-        this.setState({
-            [target.name]: target.value
-        });
+    newValues() {
+        return Array(this.props.values.length).fill('');
     }
-    handleSubmit() {
-        let value = this.state.nextSeedValue.trim();
-        if (value.length < 1) {
-            alert('You cannot set your randomization seed to empty');
-        } else if (value.length > 51) {
-            // Maximum length is 2^9 === 512 (characters) // 10 (players) === 51.
-            alert('Maximum seed length is 51.')
-        } else {
-            this.props.socket.emit('setSeed', {value});
-            this.props.closeInfo();
+    handleChange(ind, event) {
+        // because event is a synthetic event, target cannot be accessed asynchronously in setState
+        let value = event.target.value;
+        this.setState(prevState => ({values: [...prevState.values.slice(0, ind), value, ...prevState.values.slice(ind + 1)]}));
+    }
+    handleSubmit(e) {
+        let newValues = [];
+        for (let i = 0; i < this.state.values.length; i++) {
+            let value = this.state.values[i];
+            if (value === '') {
+                newValues.push(this.props.values[i]);
+            } else {
+                if (!parseInt(value) && parseInt(value) !== 0) {
+                    alert('To customize Golle values, please input an integer.');
+                    return;
+                } else if (value < 0) {
+                    alert(`Golle values must be between 0 and 51. ${value} is not.`);
+                    return;
+                } else if (value > 51) {
+                    alert(`Golle values must be between 0 and 51. ${value} is not.`);
+                    return;
+                }
+                // Only update changed values
+                newValues.push(parseInt(this.state.values[i]));
+            }
         }
+
+        this.props.socket.emit('setGolleNumbers', {values: newValues});
+        this.setState({values: this.newValues(), justUpdated: true});
+        this.props.closeInfo(e);
     }
     handleKeyDown(e) {
         e.stopPropagation();
         // Number 13 is the "Enter" key on the keyboard
         if (e.keyCode === 13) {
             e.preventDefault();
-            this.handleSubmit();
+            this.handleSubmit(e);
         }
     }
     componentDidMount() {
-        document.getElementById('seed-info').addEventListener('keydown', this.handleKeyDown);
+        document.getElementById('golle-info').addEventListener('keydown', this.handleKeyDown);
     }
     componentWillUnmount() {
-        document.getElementById('seed-info').removeEventListener('keydown', this.handleKeyDown);
+        document.getElementById('golle-info').removeEventListener('keydown', this.handleKeyDown);
     }
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.showInfo && !prevProps.showInfo) {
-            document.getElementById('new-seed').focus();
+            document.getElementById('golle-0').focus();
         }
-        // if we successfully updated the seed
-        if (this.props.currentSeed !== prevProps.currentSeed) {
-            this.setState({nextSeedValue: ''});
+        if (this.props.values.length !== prevProps.values.length) {
+            console.log('different props.values lengths.', this.props.values, prevProps.values);
+            this.setState({values: this.newValues()});
+        } else {
+            for (let i = 0; i < this.props.values.length; i++) {
+                if (this.props.values[i] !== prevProps.values[i]) {
+                    // console.log('new props values', this.props.values);
+                    // console.log('old state values', this.state.values);
+                    this.setState({values: this.newValues()});
+                    break;
+                }
+            }
         }
     }
 
     render() {
-        let seedInfoClassName = this.props.showInfo? "popuptext show": "popuptext";
+        console.log(this.props.showInfo);
+        let golleInfoClassName = this.props.showInfo? "popuptext show": "popuptext";
+        const numberInput = (val, ind) => {
+            let id = `golle-${ind}`;
+            const onChange = (e) => {this.handleChange(ind, e)};
+            return <GolleNumberInput className="four columns" key={ind} placeholder={val} id={id} value={this.state.values[ind]} onChange={onChange}/>;
+        }
+        let rows = [];
+        for (let i = 0; i < this.props.values.length; i+=3) {
+            rows.push((
+                <div key={i} className="row pad u-full-width">
+                    {this.props.values.slice(i, i + 3).map((val, ind)=>numberInput(val, i + ind))}
+                </div>
+            ))
+        }
         return (
-            <div className={seedInfoClassName} id="seed-info">
-                <div className="row">
-                    <span>Current Seed<br/></span>
-                    <input className="u-max-full-width" type="text" value={this.props.currentSeed} disabled/>
-                </div>
-                <div className="row">
-                    <span>Seed Next Hand<br/></span>
-                    <input className="u-max-full-width" name="nextSeedValue" type="text" value={this.state.nextSeedValue} onChange={this.handleInputChange} placeholder={this.props.currentSeed} id="new-seed"/>
-                </div>
+            <div className={golleInfoClassName} id="golle-info">
+                {rows}
                 <div className="button-primary" onClick={this.handleSubmit}>Submit</div>
             </div>
         );
@@ -84,6 +114,7 @@ export default class GolleButton extends Component {
         this.setState({showInfo: true});
     }
     closeInfo(e) {
+        if (e) e.stopPropagation();
         this.setState({showInfo: false});
     }
     handleInfoMouseUp(e) {
@@ -102,7 +133,7 @@ export default class GolleButton extends Component {
         return (
             <div className="button popup" onClick={this.handleClick}>
                 <span>RNG Settings</span>
-                <GolleInfo golleNumbers={this.props.golleNumbers} socket={this.props.socket} showInfo={this.state.showInfo} closeInfo={this.closeInfo}/>
+                <GolleInfo values={this.props.values} socket={this.props.socket} showInfo={this.state.showInfo} closeInfo={this.closeInfo}/>
             </div>
         );
     }
