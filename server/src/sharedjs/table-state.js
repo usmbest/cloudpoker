@@ -294,7 +294,7 @@ class Player {
     }
     getNextGolleNumber() {
         this.fillGolleNumbers(GOLLE_NUMBERS_DEFAULT_LENGTH + 1);
-        return this.golleNumbers.splice(0, 1)[0];
+        return this.golleNumbers.splice(0, 1)[0]; // lpop
     }
     fillGolleNumbers(length) {
         for (let i = this._golleNumbers.length; i < (length || GOLLE_NUMBERS_DEFAULT_LENGTH); i++) {
