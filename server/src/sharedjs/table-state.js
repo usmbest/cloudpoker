@@ -284,7 +284,7 @@ class TableState {
     };
 }
 
-const GOLLE_NUMBERS_DEFAULT_LENGTH = 4;
+const GOLLE_NUMBERS_DEFAULT_LENGTH = 9;
 class Player {
     /**
      * Constructs a Player object for use with Table.

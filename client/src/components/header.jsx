@@ -7,9 +7,7 @@ import {StandUpButton, SitDownButton} from "./standupButtons";
 import VolumeIcon from "../img/volume.svg";
 import MuteIcon from "../img/mute.svg";
 import HostOptions, {HostButton} from "./hostOptions";
-
-import SeedButton from "./seedButton";
-import straddleAbilities from "./straddleAbilities";
+import GolleButton from "./golleButton";
 
 export function Blinds({smallBlind, bigBlind}) {
     return (
@@ -73,8 +71,8 @@ export default class Header extends Component {
                         <GetLink/>
                         {this.props.loggedIn && <QuitButton socket={this.props.socket} loggedIn={this.props.loggedIn}/>}
                         {!this.props.loggedIn && <BuyInButton socket={this.props.socket} loggedIn={this.props.loggedIn}/>}
-
-                         {this.props.loggedIn && this.props.player && <SeedButton currentSeed={this.props.player.seed} socket={this.props.socket}/>}
+                        {this.props.player && <GolleButton values={this.props.player._golleNumbers} socket={this.props.socket}/>}
+                         {/*{this.props.loggedIn && this.props.player && <SeedButton currentSeed={this.props.player.seed} socket={this.props.socket}/>}*/}
                         {hostButton}
                         {hostOptions}
                         {standUpStateButton}
