@@ -34,7 +34,7 @@ export default class GolleForm extends Component {
             if (value === '') {
                 newValues.push(this.props.values[i]);
             } else {
-                if (!parseInt(value) && value !== 0) {
+                if (!parseInt(value) && parseInt(value) !== 0) {
                     alert('To customize Golle values, please input an integer.');
                     return;
                 } else if (value < 0) {
@@ -45,7 +45,7 @@ export default class GolleForm extends Component {
                     return;
                 }
                 // Only update changed values
-                newValues.push(this.state.values[i]);
+                newValues.push(parseInt(this.state.values[i]));
             }
         }
 
