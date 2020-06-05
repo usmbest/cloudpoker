@@ -284,6 +284,7 @@ class TableState {
     };
 }
 
+const GOLLE_NUMBERS_DEFAULT_LENGTH = 4;
 class Player {
     /**
      * Constructs a Player object for use with Table.
@@ -314,22 +315,28 @@ class Player {
         this.cards = [];
         console.log('initialized seed for', playerName, 'to', seed);
         this.seed = seed;
-        this._golleNumbers = golleNumbers || null;
-        // this.nextRandomNumber = nextRandomNumber || null;
+        this._golleNumbers = golleNumbers || [];
+        this.fillGolleNumbers(); // fill _golleNumbers if necessary
     }
-
-    get golleNumbers() {
-        if (!this._golleNumbers || this._golleNumbers.length < 4) {
-            this._golleNumbers = [];
-            for (let i = 0; i < 4; i++) {
-                this._golleNumbers.push(Math.floor(Math.random() * 52));
-            }
+    getNextGolleNumber() {
+        this.fillGolleNumbers(GOLLE_NUMBERS_DEFAULT_LENGTH + 1);
+        return this.golleNumbers.splice(0, 1)[0];
+    }
+    fillGolleNumbers(length) {
+        for (let i = this._golleNumbers.length; i < (length || GOLLE_NUMBERS_DEFAULT_LENGTH); i++) {
+            this._golleNumbers.push(Math.floor(Math.random() * 52));
+            if (i > 10) break;
         }
+    }
+    get golleNumbers() {
+        this.fillGolleNumbers();
         return this._golleNumbers;
     }
 
     set golleNumbers(v) {
+        console.log('setting golleNumbers', this.playerName, v);
         this._golleNumbers = v;
+        this.fillGolleNumbers();
     }
 
     showHand() {
