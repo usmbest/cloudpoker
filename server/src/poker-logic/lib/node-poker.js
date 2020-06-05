@@ -272,7 +272,10 @@ class Table extends TableState{
         const sumReducer = (accumulator, currentValue) => accumulator + currentValue;
         return this.players
             // pop the last golleNumber or, if p.golleNumbers is empty, generate an integer in [0, 51].
-            .map(p => p.golleNumbers.pop() || Math.floor(Math.random() * 52))
+            .map(p => {
+                let v = p.golleNumbers.pop();
+                return v || v === 0? v: Math.floor(Math.random() * 52);
+            })
             // sum the golle numbers and modulo them
             .reduce(sumReducer) % 52;
     }
