@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const cookieParser = require('cookie-parser');
 const xss = require("xss");
-const { v4 } = require('uuid');
 
 router.use('/', cookieParser(process.env.COOKIE_SECRET));
 router.use('/:id', cookieParser(process.env.COOKIE_SECRET));
@@ -14,7 +13,6 @@ const {asyncErrorHandler, sleep, asyncSchemaValidator, formatJoiError} = require
 const poker = require('../poker-logic/lib/node-poker');
 const socketioJwt   = require('socketio-jwt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const {getGameLog} = require("../redisHelpers");
 const {addToGameLog} = require("../redisHelpers");
 const {initializeTableRedis} = require("../redisHelpers");
@@ -103,7 +101,7 @@ router.route('/').post(asyncErrorHandler(async (req, res) => {
 
     const tableNamespace = sio.of('/' + value.tableName);
     let table = new poker.Table(req.body.smallBlind, req.body.bigBlind, 2, 10, 1, 500000000000, req.body.straddleLimit)
-    sessionManagers.set(value.tableName, new SessionManager(tableNamespace, value.tableName, table, req.body.name, req.body.stack, false, v4(), playerId));
+    sessionManagers.set(value.tableName, new SessionManager(tableNamespace, value.tableName, table, req.body.name, req.body.stack, false, playerId));
     await initializeTableRedis(table, value.tableName);
 
     await res.json(value);
@@ -122,7 +120,7 @@ const sessionManagers = new Map();
         const pids = await getPlayerIdsForTable(sid);
         const tableNamespace = sio.of('/' + sid);
         let modIds = table.allPlayers.filter(p=>p!==null&&p.isMod).map(p=>pids[p.playerName].playerid);
-        const manager = new SessionManager(tableNamespace, sid, table, null, null, null, null, null, pids, modIds);
+        const manager = new SessionManager(tableNamespace, sid, table, null, null, null, null, pids, modIds);
         sessionManagers.set(sid, manager);
         if (table.game) {
             await manager.check_round(prev_round);
@@ -149,12 +147,11 @@ const sessionManagers = new Map();
 //         this.previousTableState = tableState;
 //     }
 // }
-const sha256Hash = (str) => crypto.createHash('sha256').update(str).digest('hex');
 
 const TABLE_EXPIRY_TIMEOUT = 1000 * 60 * 30; // 30 minutes
 class SessionManager extends TableManager {
-    constructor(io, sid, table, hostName, hostStack, hostIsStraddling, hostSeed, playerid, playerids, modIds) {
-        super(sid, table, hostName, hostStack, hostIsStraddling, hostSeed, playerid, playerids, modIds);
+    constructor(io, sid, table, hostName, hostStack, hostIsStraddling, playerid, playerids, modIds) {
+        super(sid, table, hostName, hostStack, hostIsStraddling, playerid, playerids, modIds);
         this.io = io;
         this.socketMap = new Map();
         // maps player id -> playerName when kicked
@@ -307,8 +304,8 @@ class SessionManager extends TableManager {
         return await getGameLog(this.sid, cursor);
     }
 
-    async handleBuyIn(playerName, playerid, stack, isStraddling, seed) {
-        const addedPlayer = super.buyin(playerName, playerid, stack, isStraddling, seed);
+    async handleBuyIn(playerName, playerid, stack, isStraddling) {
+        const addedPlayer = super.buyin(playerName, playerid, stack, isStraddling);
         if (addedPlayer) {
             if (this.registeredGuests[playerid]) {
                 // remove playerid from registeredGuests as player is no longer a guest.
@@ -324,9 +321,7 @@ class SessionManager extends TableManager {
             this.sendTableState();
             await this.addToGameLog('buy-in', {
                 playerName: playerName,
-                stack: stack,
-                playerSeedHash: sha256Hash(super.getPlayerSeed(playerName)),
-                tableSeedHash: sha256Hash(this.table.getSeed()),
+                stack: stack
             });
         } else {
             // set or update this guest's name
@@ -357,27 +352,6 @@ class SessionManager extends TableManager {
             this.sendTableStateTo(this.getSocketId(this.getPlayerId(playerName)), playerName);
         }
         return didSet;
-    }
-    async setPlayerSeed(playerName, value) {
-        value = value.trim();
-        let setSeed = super.setPlayerSeed(playerName, value);
-        if (setSeed) {
-            this.sendTableState();
-            await this.addToGameLog('action', {
-                action: 'setSeed',
-                seat: super.getPlayerSeat(playerName),
-                playerName: playerName,
-                value: value,
-                tableSeedHash: sha256Hash(this.table.getSeed()),
-            },{
-                action: 'setSeed',
-                seat: super.getPlayerSeat(playerName),
-                playerName: playerName,
-                playerSeedHash: sha256Hash(value),
-                tableSeedHash: sha256Hash(this.table.getSeed()),
-            });
-        }
-        return setSeed;
     }
     async standUpPlayer(playerName) {
         if (this.isPlayerStandingUp(playerName)) return;
@@ -482,7 +456,7 @@ class SessionManager extends TableManager {
     }
 
     async addToGameLog(logEvent, args, emittedArgs) {
-        if (!args.disableEmit) this.io.emit(logEvent, emittedArgs || args);
+        if (!args || !args.disableEmit) this.io.emit(logEvent, emittedArgs || args);
         await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, ...Object.entries(args || {}).flat());
     }
 
@@ -659,15 +633,12 @@ async function handleOnAuth(s, socket) {
         playerName: Joi.string().trim().min(2).external(xss).required(),
         stack: Joi.number().min(0).required(),
         isStraddling: Joi.boolean(),
-        seed: Joi.string().trim().max(51).external(xss).optional(),
     });
     socket.on('buy-in', asyncSchemaValidator(buyInSchema, async (data) => {
         if (!s.canPlayerJoin(playerId, data.playerName, data.stack, data.isStraddling === true)) {
             return;
         }
-        data.seed = data.seed && data.seed.length > 0? data.seed: v4();
-        // console.log('buy in seed is undefined', data.seed === undefined);
-        await s.handleBuyIn(data.playerName, playerId, data.stack, data.isStraddling === true, data.seed);
+        await s.handleBuyIn(data.playerName, playerId, data.stack, data.isStraddling === true);
     }));
 
     const straddleSwitchSchema = Joi.object({
@@ -742,14 +713,6 @@ async function handleOnAuth(s, socket) {
         const playerName = s.getPlayerById(playerId);
         await s.setPlayerGolleNumbers(playerName, values);
     }))
-
-    const setSeedSchema = Joi.object({
-        value: Joi.string().trim().min(1).max(51).external(xss).required()
-    }).external(isSeatedPlayerIdValidator);
-    socket.on('setSeed', asyncSchemaValidator(setSeedSchema, async ({value}) => {
-        const playerName = s.getPlayerById(playerId);
-        await s.setPlayerSeed(playerName, value);
-    }));
 
     socket.on('get-buyin-info', () => {
         io.to(socket.id).emit('get-buyin-info', s.getBuyinBuyouts());

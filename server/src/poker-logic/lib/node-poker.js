@@ -167,7 +167,7 @@ class Table extends TableState{
         p.standingUp = false;
         return true;
     }
-    AddPlayer(playerName, chips, isStraddling, seed) {
+    AddPlayer(playerName, chips, isStraddling) {
         // console.log(`adding player ${playerName}`);
         // Check if playerName already exists
         const ind = this.allPlayers.findIndex(p => p !== null && p.playerName === playerName);
@@ -177,13 +177,12 @@ class Table extends TableState{
                 p.leavingGame = false;
                 p.chips = chips;
                 p.isStraddling = isStraddling;
-                p.seed = seed;
                 return true;
             }
         } else {
             const seat = this.getAvailableSeat();
             if ( chips >= this.minBuyIn && chips <= this.maxBuyIn && seat !== -1) {
-                const player = new Player(playerName, chips, isStraddling, seat, false, seed);
+                const player = new Player(playerName, chips, isStraddling, seat, false);
                 this.allPlayers[seat] = player;
                 return true;
             }

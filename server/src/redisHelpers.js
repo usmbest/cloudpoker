@@ -52,15 +52,8 @@ async function getGameStream(sid, gameId) {
 }
 module.exports.getGameStream = getGameStream;
 
-const sha256Hash = (str) => crypto.createHash('sha256').update(str).digest('hex');
 const transformLogStreamElement = (el) => {
     delete el.type;
-    if (el.logEvent === 'action') {
-        if (el.action === 'setSeed') {
-            el.playerSeedHash = sha256Hash(el.value);
-            delete el.value;
-        }
-    }
     return el;
 }
 
@@ -88,20 +81,13 @@ async function getGameLog(sid, cursor) {
 }
 module.exports.getGameLog = getGameLog;
 
-const transformRngState = (playerVal) =>  {
-    delete playerVal.type;
-    for (const prop in playerVal)
-        if (playerVal.hasOwnProperty(prop))
-            playerVal[prop] = parseInt(playerVal[prop]);
-    return Object.assign({}, playerVal);
-}
 const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
 const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(v => parseInt(v));
 const transformPlayerState = (playerVal) => {
-    const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', playerVal.seed);
+    console.log('transformPlayerState', playerVal);
+    const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', transformGolleNumberString(playerVal.golleNumbers));
     p.inHand = playerVal.inHand !== 'false';
     p.standingUp = playerVal.standingUp !== 'false';
-    p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
 }
 async function getTableState(sid, gameId) {
@@ -113,12 +99,9 @@ async function getTableState(sid, gameId) {
     let gameStream = await getGameStream(sid, gameId);
     gameStream = gameStream.map(formatStreamElement);
     let i;
-    let rngState;
     for (i = 0; i < gameStream.length; i++) {
         let playerVal = gameStream[i];
-        if (playerVal.type === 'rngState') {
-            rngState = transformRngState(playerVal);
-        } else if (playerVal.type === 'playerState') {
+        if (playerVal.type === 'playerState') {
             table.allPlayers[i] = transformPlayerState(playerVal);
         } else {
             break; // if we have reached the action stream
@@ -134,9 +117,8 @@ async function getTableState(sid, gameId) {
         for (; i< gameStream.length; i++) {
             let el = gameStream[i];
             if (!(el.type === 'log' && el.logEvent === 'action')) continue;
-            if (el.action === 'setSeed') {
-                table.allPlayers[el.seat].seed = el.value;
-            } else if (el.action === 'setGolleNumbers') {
+            if (el.action === 'setGolleNumbers') {
+                console.log('redis setGolleNumbers', el.values);
                 table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
             } else {
                 prev_round = table.game.roundName.toLowerCase();
@@ -187,17 +169,7 @@ module.exports.getGameIdForTable = getGameIdForTable;
 const getGameState = async (sid, gameId) => {
     return await hgetallAsync(fmtGameStateId(sid, gameId));
 }
-const setRngState = (multi, table, sid) => {
-    if (table.game) {
-        let state = table.initialRngState;
-        let args = [
-            'type', 'rngState',
-            ...Object.entries(state).flat()
-        ]
-        multi.xadd(fmtGameStreamId(sid, table.game.id), '*', ...args);
-        TableLogger.addOp(sid, 'rngState', args);
-    }
-}
+
 const setInitialPlayerStates = (multi, table, sid) => {
     let gameId = table.game? table.game.id: 'none';
     // sort of hacky. delete the previous stream. only has an effect if gameId === 'none'
@@ -220,7 +192,6 @@ const addPlayerArgs = (table, sid, p) => {
         'isMod', p.isMod,
         'isStraddling', p.isStraddling,
         'seat', p.seat,
-        'seed', p.seed,
         'golleNumbers', convertGolleNumberArray(p.golleNumbers),
     ];
     return args;
@@ -242,7 +213,6 @@ async function initializeGameRedis(table, sid, multi) {
     let startTime = Date.now();
     await setInitialGameState(multi, table, sid, startTime);
     setInitialPlayerStates(multi, table, sid);
-    // setRngState(multi, table, sid);
 
     await trimGameList(multi, sid, 40);
 

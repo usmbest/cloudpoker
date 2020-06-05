@@ -1,4 +1,3 @@
-const seedrandom = require("seedrandom");
 const {rankHandInt} = require("../poker-logic/lib/deck");
 const { v4 } = require('uuid');
 
@@ -29,10 +28,6 @@ class TableState {
         this.maxBuyIn = maxBuyIn;
         this.straddleLimit = straddleLimit;
         this.game = null;
-
-        this.previousSeed = null;
-        this.rng = null;
-        this.initialRngState = null;
 
         //Validate acceptable value ranges.
         let err;
@@ -241,25 +236,6 @@ class TableState {
         console.log(`Invalid straddleLimit value ${this.straddleLimit}`);
         return 0;
     };
-    getSeed() {
-        // concatenate player seeds, ordered by seat
-        return this.players.map(p=>p.seed).join('');
-    }
-    setRng(seed, state) { // intended to be used when syncing from redis
-        this.rng = seedrandom.xorwow('', {state});
-        this.previousSeed = seed;
-    }
-    updateRng() {
-        let newSeed = this.getSeed();
-        // console.log('previous rng state:', this.rng? this.rng.state(): null);
-        if (this.previousSeed !== newSeed) {
-            this.rng = new seedrandom.xorwow(newSeed, {state: true});
-            console.log('updating seed from', this.previousSeed, 'to', newSeed);
-            this.previousSeed = newSeed;
-        }
-        this.initialRngState = this.rng.state();
-        return this.rng;
-    }
     getAvailableSeat() {
         return this.allPlayers.findIndex(elem => elem === null || elem.leavingGame);
     };
@@ -293,7 +269,7 @@ class Player {
      * @param isStraddling If the player wants to straddle
      * @constructor
      */
-    constructor(playerName, chips, isStraddling, seat, isMod, seed, golleNumbers) {
+    constructor(playerName, chips, isStraddling, seat, isMod, golleNumbers) {
         this.playerName = playerName;
         this.chips = chips;
         this.checked = false;
@@ -313,8 +289,6 @@ class Player {
         this.showingCards = false;
         // private fields
         this.cards = [];
-        console.log('initialized seed for', playerName, 'to', seed);
-        this.seed = seed;
         this._golleNumbers = golleNumbers || [];
         this.fillGolleNumbers(); // fill _golleNumbers if necessary
     }
@@ -325,7 +299,6 @@ class Player {
     fillGolleNumbers(length) {
         for (let i = this._golleNumbers.length; i < (length || GOLLE_NUMBERS_DEFAULT_LENGTH); i++) {
             this._golleNumbers.push(Math.floor(Math.random() * 52));
-            if (i > 10) break;
         }
     }
     get golleNumbers() {
