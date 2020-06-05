@@ -89,11 +89,13 @@ const transformRngState = (playerVal) =>  {
             playerVal[prop] = parseInt(playerVal[prop]);
     return Object.assign({}, playerVal);
 }
+const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
+const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(parseInt);
 const transformPlayerState = (playerVal) => {
     const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', playerVal.seed);
     p.inHand = playerVal.inHand !== 'false';
     p.standingUp = playerVal.standingUp !== 'false';
-    p.golleNumbers = playerVal.golleNumbers.split(',').map(parseInt);
+    p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
 }
 async function getTableState(sid, gameId) {
@@ -129,7 +131,7 @@ async function getTableState(sid, gameId) {
             if (el.action === 'setSeed') {
                 table.allPlayers[el.seat].seed = el.value;
             } else if (el.action === 'setGolleNumbers') {
-                table.allPlayers[el.seat].golleNumbers = el.values.split(',').map(parseInt);
+                table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
             } else {
                 prev_round = table.game.roundName.toLowerCase();
                 table.applyAction(el.seat, el.action, el.amount || 0);
@@ -213,7 +215,7 @@ const addPlayerArgs = (table, sid, p) => {
         'isStraddling', p.isStraddling,
         'seat', p.seat,
         'seed', p.seed,
-        'golleNumbers', p.golleNumbers.join(','),
+        'golleNumbers', convertGolleNumberArray(p.golleNumbers),
     ];
     return args;
 }
