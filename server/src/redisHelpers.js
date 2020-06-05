@@ -93,6 +93,7 @@ const transformPlayerState = (playerVal) => {
     const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', playerVal.seed);
     p.inHand = playerVal.inHand !== 'false';
     p.standingUp = playerVal.standingUp !== 'false';
+    p.golleNumbers = playerVal.golleNumbers.split(',').map(parseInt);
     return p;
 }
 async function getTableState(sid, gameId) {
@@ -126,10 +127,9 @@ async function getTableState(sid, gameId) {
             let el = gameStream[i];
             if (!(el.type === 'log' && el.logEvent === 'action')) continue;
             if (el.action === 'setSeed') {
-                // TODO: shouldn't this be table.allPlayers[el.seat].seed, without [i]?
-                table.allPlayers[i][el.seat].seed = el.value;
+                table.allPlayers[el.seat].seed = el.value;
             } else if (el.action === 'setGolleNumbers') {
-                table.allPlayers[i][el.seat].golleNumbers = el.values.split(',').map(parseInt);
+                table.allPlayers[el.seat].golleNumbers = el.values.split(',').map(parseInt);
             } else {
                 prev_round = table.game.roundName.toLowerCase();
                 table.applyAction(el.seat, el.action, el.amount || 0);
