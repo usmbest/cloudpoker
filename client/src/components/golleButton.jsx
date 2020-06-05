@@ -4,7 +4,7 @@ import GolleNumberInput from "./golleNumberInput";
 class GolleInfo extends Component {
     constructor(props) {
         super(props);
-        this.state = {values: this.newValues(), justUpdated: false}
+        this.state = {values: this.newValues()}
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -40,7 +40,7 @@ class GolleInfo extends Component {
         }
 
         this.props.socket.emit('setGolleNumbers', {values: newValues});
-        this.setState({values: this.newValues(), justUpdated: true});
+        this.setState({values: this.newValues()});
         this.props.closeInfo(e);
     }
     handleKeyDown(e) {
@@ -49,6 +49,8 @@ class GolleInfo extends Component {
         if (e.keyCode === 13) {
             e.preventDefault();
             this.handleSubmit(e);
+        } else if (e.keyCode === 27) { // esc key
+            this.props.closeInfo(e);
         }
     }
     componentDidMount() {
