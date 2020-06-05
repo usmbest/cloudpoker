@@ -334,7 +334,6 @@ class Player {
     }
 
     set golleNumbers(v) {
-        console.log('setting golleNumbers', this.playerName, v);
         this._golleNumbers = v;
         this.fillGolleNumbers();
     }

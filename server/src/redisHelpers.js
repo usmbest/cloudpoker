@@ -90,7 +90,7 @@ const transformRngState = (playerVal) =>  {
     return Object.assign({}, playerVal);
 }
 const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
-const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(parseInt);
+const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(v => parseInt(v));
 const transformPlayerState = (playerVal) => {
     const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', playerVal.seed);
     p.inHand = playerVal.inHand !== 'false';
