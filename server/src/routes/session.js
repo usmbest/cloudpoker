@@ -347,10 +347,12 @@ class SessionManager extends TableManager {
             this.sendTableState();
             await this.addToGameLog('action', {
                 action: 'setGolleNumbers',
+                seat: super.getPlayerSeat(playerName),
                 playerName: playerName,
                 values: values.join(','),
             },{
                 action: 'setGolleNumbers',
+                seat: super.getPlayerSeat(playerName),
                 playerName: playerName,
             });
         } else {
@@ -366,11 +368,13 @@ class SessionManager extends TableManager {
             this.sendTableState();
             await this.addToGameLog('action', {
                 action: 'setSeed',
+                seat: super.getPlayerSeat(playerName),
                 playerName: playerName,
                 value: value,
                 tableSeedHash: sha256Hash(this.table.getSeed()),
             },{
                 action: 'setSeed',
+                seat: super.getPlayerSeat(playerName),
                 playerName: playerName,
                 playerSeedHash: sha256Hash(value),
                 tableSeedHash: sha256Hash(this.table.getSeed()),
