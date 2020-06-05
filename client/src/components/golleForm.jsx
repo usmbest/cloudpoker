@@ -1,15 +1,5 @@
 import React, {Component} from "react";
-
-class GolleNumberInput extends Component {
-    render() {
-        return <input type="number"
-                      className="inputVal two columns golleInput"
-                      id={this.props.id}
-                      placeholder={this.props.placeholder}
-                      value={this.props.value}
-                      onChange={this.props.onChange}/>;
-    }
-}
+import GolleNumberInput from "./golleNumberInput";
 
 export default class GolleForm extends Component {
     constructor(props) {
@@ -89,7 +79,7 @@ export default class GolleForm extends Component {
         const numberInput = (val, ind) => {
             let id = `golle-${ind}`;
             const onChange = (e) => {this.handleChange(ind, e)};
-            return <GolleNumberInput key={ind} placeholder={val} id={id} value={this.state.values[ind]} onChange={onChange}/>;
+            return <GolleNumberInput className="two columns" key={ind} placeholder={val} id={id} value={this.state.values[ind]} onChange={onChange}/>;
         }
         // \u2713 is a checkmark
         let buttonText = this.state.justUpdated? "Updated \u2713": "Update";
