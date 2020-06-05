@@ -61,7 +61,7 @@ export default class BelowTable extends Component {
         let actionData = this.props.manager.getAvailableActions(this.props.player? this.props.player.playerName: undefined);
         let above = (
             <div>
-                {this.props.player && <GolleForm values={this.props.player._golleNumbers} socket={this.props.socket}/>}
+                {/*{this.props.player && <GolleForm values={this.props.player._golleNumbers} socket={this.props.socket}/>}*/}
                 <div id="buttons-above-chatroom">
                     <a onClick={this.openLog} className="button" id="game-log-opn">Log</a>
                     <a onClick={this.openLog} className="button" id="buyin-log-opn">Buy-ins</a>
