@@ -3,7 +3,6 @@ import BuyInLog from "./buyInLog";
 import GameLog from "./gameLog";
 import ChatRoomContainer from "./chatRoomContainer";
 import Actions from "./actions";
-import GolleForm from "./golleForm";
 // import HandHistory from "./handHistory";
 
 export default class BelowTable extends Component {

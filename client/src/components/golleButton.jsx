@@ -108,7 +108,8 @@ export default class GolleButton extends Component {
         this.closeInfo = this.closeInfo.bind(this);
         this.handleInfoMouseUp = this.handleInfoMouseUp.bind(this);
     }
-    toggleShowInfo() {
+    toggleShowInfo(e) {
+        if (e) e.stopPropagation();
         this.setState(prevState => ({showInfo: !prevState.showInfo}));
     }
     closeInfo(e) {
