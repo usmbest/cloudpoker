@@ -66,7 +66,7 @@ export default class ChatRoomContainer extends Component {
         let className = this.props.collapse? "c collapse": "c";
         return (
             <div className={className} id="c">
-                {this.props.buttonsAbove}
+                {this.props.above}
                 <ChatRoom
                     messages={this.props.messages}
                     feedbackText={this.props.feedbackText}

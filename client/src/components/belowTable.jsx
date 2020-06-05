@@ -3,7 +3,7 @@ import BuyInLog from "./buyInLog";
 import GameLog from "./gameLog";
 import ChatRoomContainer from "./chatRoomContainer";
 import Actions from "./actions";
-import GolleInput from "./golleInput";
+import GolleForm from "./golleForm";
 // import HandHistory from "./handHistory";
 
 export default class BelowTable extends Component {
@@ -20,7 +20,6 @@ export default class BelowTable extends Component {
         this.closeLog = this.closeLog.bind(this);
         this.toggleBetSlider = this.toggleBetSlider.bind(this);
         this.getBuyInListener = this.getBuyInListener.bind(this);
-        this.buttonsAboveChatroom = this.buttonsAboveChatroom.bind(this);
 
         this.actionButtonClickHandlers = {
             'show-hand': () => {
@@ -58,29 +57,28 @@ export default class BelowTable extends Component {
     toggleBetSlider() {
         this.setState((state, props) => ({betActionsOpen: !state.betActionsOpen}));
     }
-    buttonsAboveChatroom() {
-        return (
-            <div id="buttons-above-chatroom">
-                <a onClick={this.openLog} className="button" id="rng-settings-opn">RNG Settings</a>
-                <a onClick={this.openLog} className="button" id="game-log-opn">Log</a>
-                <a onClick={this.openLog} className="button" id="buyin-log-opn">Buy-ins</a>
-                {/*<a onClick={this.openLog} className="button" id="hand-his-log-opn">Hand History</a>*/}
-            </div>
-        );
-    }
-
     render() {
         let actionData = this.props.manager.getAvailableActions(this.props.player? this.props.player.playerName: undefined);
+        let above = (
+            <div>
+                {this.props.player && <GolleForm values={this.props.player._golleNumbers} socket={this.props.socket}/>}
+                <div id="buttons-above-chatroom">
+                    <a onClick={this.openLog} className="button" id="game-log-opn">Log</a>
+                    <a onClick={this.openLog} className="button" id="buyin-log-opn">Buy-ins</a>
+                    {/*<a onClick={this.openLog} className="button" id="hand-his-log-opn">Hand History</a>*/}
+                </div>
+            </div>
+        );
         return (
             <div className="below-table u-full-width">
-                {this.props.player && <GolleInput values={this.props.player.golleNumbers} socket={this.props.socket}/>}
+
                 <BuyInLog buyInData={this.state.buyInData} onClose={this.closeLog} width={this.state.openLogId === 'buyin-log-opn'? "100%": "0%"}/>
                 <GameLog onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn' ? "100%": "0%"} volumeOn={this.props.volumeOn} socket={this.props.socket}/>
                 {/*<HandHistory handEndLog={this.props.handEndLog} onClose={this.closeLog} width={this.state.openLogId === 'game-log-opn'? "100%": "0%"}/>*/}
                 <ChatRoomContainer socket={this.props.socket}
                                    messages={this.props.messages}
                                    feedbackText={this.props.feedbackText}
-                                   buttonsAbove={this.buttonsAboveChatroom()}
+                                   above={above}
                                    collapse={this.state.betActionsOpen}/>
                 <Actions availableActions={actionData.availableActions}
                          canPerformPremoves={actionData.canPerformPremoves}

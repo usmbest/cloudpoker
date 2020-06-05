@@ -19,9 +19,9 @@ export default class GameLog extends Component {
             'sitDown': data => data.playerName + ' sits down.\n',
             'standUp': data => data.playerName + ' stands up.\n',
             'setSeed': data => 'The SHA256 hash for ' + data.playerName + '\'s new RNG seed is ' + data.playerSeedHash + '. The SHA256 hash for the table seed is now ' + data.tableSeedHash + '.',
+            'setGolleNumbers': data => '',
             'removePlayer': data => `${data.playerName} has left the game (finishing stack: ${data.stack})\n`,
             'action': data => this.messageFormatters[data.action](data),
-
             'buy-in': data => {
                 // let message = data.playerName + ' buys in for ' + data.stack + `. SHA256 hash for ${data.playerName}'s seed is ${data.playerSeedHash}.`;
                 // if (data.tableSeedHash) message += ` Table seed hash is ${data.tableSeedHash}.`;
