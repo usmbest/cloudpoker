@@ -64,13 +64,10 @@ class GolleInfo extends Component {
             document.getElementById('golle-0').focus();
         }
         if (this.props.values.length !== prevProps.values.length) {
-            console.log('different props.values lengths.', this.props.values, prevProps.values);
             this.setState({values: this.newValues()});
         } else {
             for (let i = 0; i < this.props.values.length; i++) {
                 if (this.props.values[i] !== prevProps.values[i]) {
-                    // console.log('new props values', this.props.values);
-                    // console.log('old state values', this.state.values);
                     this.setState({values: this.newValues()});
                     break;
                 }
@@ -79,7 +76,6 @@ class GolleInfo extends Component {
     }
 
     render() {
-        console.log(this.props.showInfo);
         let golleInfoClassName = this.props.showInfo? "popuptext show": "popuptext";
         const numberInput = (val, ind) => {
             let id = `golle-${ind}`;
@@ -108,12 +104,12 @@ export default class GolleButton extends Component {
     constructor(props) {
         super(props);
         this.state = {showInfo: false};
-        this.handleClick = this.handleClick.bind(this);
+        this.toggleShowInfo = this.toggleShowInfo.bind(this);
         this.closeInfo = this.closeInfo.bind(this);
         this.handleInfoMouseUp = this.handleInfoMouseUp.bind(this);
     }
-    handleClick() {
-        this.setState({showInfo: true});
+    toggleShowInfo() {
+        this.setState(prevState => ({showInfo: !prevState.showInfo}));
     }
     closeInfo(e) {
         if (e) e.stopPropagation();
@@ -133,7 +129,7 @@ export default class GolleButton extends Component {
 
     render() {
         return (
-            <div className="button popup" onClick={this.handleClick}>
+            <div className="button popup" onClick={this.toggleShowInfo}>
                 <span>RNG Settings</span>
                 <GolleInfo values={this.props.values} socket={this.props.socket} showInfo={this.state.showInfo} closeInfo={this.closeInfo}/>
             </div>
