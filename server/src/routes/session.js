@@ -350,10 +350,7 @@ class SessionManager extends TableManager {
                 seat: super.getPlayerSeat(playerName),
                 playerName: playerName,
                 values: values.join(','),
-            },{
-                action: 'setGolleNumbers',
-                seat: super.getPlayerSeat(playerName),
-                playerName: playerName,
+                disableEmit: true,
             });
         } else {
             // u
@@ -485,7 +482,7 @@ class SessionManager extends TableManager {
     }
 
     async addToGameLog(logEvent, args, emittedArgs) {
-        this.io.emit(logEvent, emittedArgs || args);
+        if (!args.disableEmit) this.io.emit(logEvent, emittedArgs || args);
         await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, ...Object.entries(args || {}).flat());
     }
 

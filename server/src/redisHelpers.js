@@ -59,12 +59,18 @@ const transformLogStreamElement = (el) => {
         if (el.action === 'setSeed') {
             el.playerSeedHash = sha256Hash(el.value);
             delete el.value;
-        } else if (el.action === 'setGolleNumbers') {
-            delete el.values;
         }
     }
     return el;
 }
+
+/**
+ *
+ * @param sid
+ * @param cursor
+ * @return {Promise<[]>} Array of elements formatted without private information. Elements where disableEmit
+ * is true, such as setGolleNumber elements, are excluded.
+ */
 async function getGameLog(sid, cursor) {
     // get the 5 most recent gameIds before cursor
     let gameIds = await lrangeAsync(fmtGameListId(sid), cursor, cursor + 4);
@@ -74,7 +80,7 @@ async function getGameLog(sid, cursor) {
         let gameStream = await getGameStream(sid, gameId);
         let gameLog = gameStream
             .map(formatStreamElement)
-            .filter(el=>el.type==='log')
+            .filter(el=>el.type==='log' && el.disableEmit !== 'true')
             .map(transformLogStreamElement);
         log.push(...gameLog);
     }
