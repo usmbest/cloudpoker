@@ -296,7 +296,7 @@ class Player {
     }
     fillGolleNumbers(length) {
         for (let i = this._golleNumbers.length; i < (length || GOLLE_NUMBERS_DEFAULT_LENGTH); i++) {
-            this._golleNumbers.push(Math.floor(this.rng() * 52));
+            this._golleNumbers.push(Math.floor(this._rng() * 52));
         }
     }
     get golleNumbers() {
@@ -307,6 +307,13 @@ class Player {
     set golleNumbers(v) {
         this._golleNumbers = v;
         this.fillGolleNumbers();
+    }
+    get seed() {
+        return this._seed;
+    }
+    set seed(v) {
+        this._seed = v;
+        this._rng = new seedrandom.xorwow(this._seed);
     }
 
     showHand() {
@@ -323,7 +330,6 @@ class Player {
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
         this.seed = v4();
-        this.rng = new seedrandom.xorwow(this.seed);
     }
 
     get isWaiting() {
