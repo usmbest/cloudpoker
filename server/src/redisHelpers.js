@@ -99,13 +99,11 @@ async function getTableState(sid, gameId) {
     let gameStream = await getGameStream(sid, gameId);
     gameStream = gameStream.map(formatStreamElement);
     console.log(gameStream);
-    let playerGolleNumbers = Array(10).fill(null, 0, 10);
     let i;
     for (i = 0; i < gameStream.length; i++) {
         let playerVal = gameStream[i];
         if (playerVal.type === 'playerState') {
             table.allPlayers[i] = transformPlayerState(playerVal);
-            playerGolleNumbers[i] = transformGolleNumberString(playerVal.golleNumbers);
         } else {
             break; // if we have reached the action stream
         }
@@ -115,10 +113,6 @@ async function getTableState(sid, gameId) {
     if (gameId !== 'none') {
         table.dealer = (table.dealer - 1) % table.players.length;
         table.initNewRound();
-        for (let i = 0; i < table.allPlayers.length; i++) {
-            if (table.allPlayers[i])
-                table.allPlayers[i].golleNumbers = playerGolleNumbers[i];
-        }
         table.game.id = gameId;
         // sync actions
         for (; i< gameStream.length; i++) {
