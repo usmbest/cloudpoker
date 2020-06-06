@@ -1,3 +1,4 @@
+const seedrandom = require("seedrandom");
 const {rankHandInt} = require("../poker-logic/lib/deck");
 const { v4 } = require('uuid');
 
@@ -295,7 +296,7 @@ class Player {
     }
     fillGolleNumbers(length) {
         for (let i = this._golleNumbers.length; i < (length || GOLLE_NUMBERS_DEFAULT_LENGTH); i++) {
-            this._golleNumbers.push(Math.floor(Math.random() * 52));
+            this._golleNumbers.push(Math.floor(this.rng() * 52));
         }
     }
     get golleNumbers() {
@@ -322,7 +323,7 @@ class Player {
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
         this.seed = v4();
-        // this.rng =
+        this.rng = new seedrandom.xorwow(this.seed);
     }
 
     get isWaiting() {
