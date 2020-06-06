@@ -285,6 +285,7 @@ class Player {
         // private fields
         this.cards = [];
 
+        this.seed = v4();
         this.clearHandState();
 
         this._golleNumbers = golleNumbers || [];
@@ -329,7 +330,6 @@ class Player {
         this.allIn = false;
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
-        this.seed = v4();
     }
 
     get isWaiting() {
