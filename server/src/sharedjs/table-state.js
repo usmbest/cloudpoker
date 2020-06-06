@@ -272,23 +272,20 @@ class Player {
     constructor(playerName, chips, isStraddling, seat, isMod, golleNumbers) {
         this.playerName = playerName;
         this.chips = chips;
-        this.checked = false;
-        this.folded = false;
-        this.allIn = false;
-        this.talked = false;
         // If the player is in the current hand. False is they just joined and are waiting for the next hand.
         this.inHand = false;
         // If the player is standing up from the table
         this.standingUp = false;
-        this.bet = 0;
         this.isStraddling = isStraddling;
         this.seat = seat;
         this.leavingGame = false;
         // below fields used only externally
         this.isMod = isMod;
-        this.showingCards = false;
         // private fields
         this.cards = [];
+
+        this.clearHandState();
+
         this._golleNumbers = golleNumbers || [];
         this.fillGolleNumbers(); // fill _golleNumbers if necessary
     }
@@ -324,6 +321,8 @@ class Player {
         this.allIn = false;
         this.cards.splice(0, this.cards.length);
         this.showingCards = false;
+        this.seed = v4();
+        // this.rng =
     }
 
     get isWaiting() {
