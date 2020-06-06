@@ -126,7 +126,7 @@ class Table extends TableState{
         return betAmount;
     };
 
-    initNewRound () {
+    clearHandState() {
         this.removeAndAddPlayers();
         let handNextRound = this.allPlayers.filter(p => p !== null && !p.standingUp).length >= 2;
         for (let i = 0; i < this.allPlayers.length; i += 1) {
@@ -134,6 +134,10 @@ class Table extends TableState{
             this.allPlayers[i].inHand = !this.allPlayers[i].standingUp && handNextRound;
             this.allPlayers[i].clearHandState();
         }
+    }
+
+    initNewRound(disableDeal, disableBlinds) {
+        this.clearHandState();
         if (this.players.length < 2) {
             console.log('not enough players (initNewRound)');
             this.dealer = 0;
@@ -143,14 +147,14 @@ class Table extends TableState{
         }
         this.dealer = (this.dealer + 1) % this.players.length;
         this.game = new Game(this.smallBlind, this.bigBlind);
-
-        //Deal 2 cards to each player
+        if (!disableDeal) this.dealPocketCards();
+        if (!disableBlinds) this.initializeBlinds();
+    }
+    dealPocketCards() {
         for (let i = 0; i < this.players.length; i += 1) {
             this.players[i].cards.push(this.nextCard(), this.nextCard());
-            this.players[i].bet = 0;
             this.game.roundBets[i] = 0;
         }
-        this.initializeBlinds();
     }
     standUpPlayer(playerName) {
         const p = this.allPlayers.find(p => p !== null && p.playerName === playerName);
