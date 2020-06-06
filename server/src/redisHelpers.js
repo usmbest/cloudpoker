@@ -88,6 +88,7 @@ const transformPlayerState = (playerVal) => {
     const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', transformGolleNumberString(playerVal.golleNumbers));
     p.inHand = playerVal.inHand !== 'false';
     p.standingUp = playerVal.standingUp !== 'false';
+    p.seed = playerVal.seed;
     return p;
 }
 async function getTableState(sid, gameId) {
@@ -98,7 +99,7 @@ async function getTableState(sid, gameId) {
 
     let gameStream = await getGameStream(sid, gameId);
     gameStream = gameStream.map(formatStreamElement);
-    console.log(gameStream);
+    console.log('getTableState gameStream', gameStream);
     let i;
     for (i = 0; i < gameStream.length; i++) {
         let playerVal = gameStream[i];
@@ -193,6 +194,7 @@ const addPlayerArgs = (table, sid, p) => {
         'isMod', p.isMod,
         'isStraddling', p.isStraddling,
         'seat', p.seat,
+        'seed', p.seed,
         'golleNumbers', convertGolleNumberArray(p.golleNumbers),
     ];
     return args;
