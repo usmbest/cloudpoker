@@ -13,6 +13,7 @@ const {asyncErrorHandler, sleep, asyncSchemaValidator, formatJoiError} = require
 const poker = require('../poker-logic/lib/node-poker');
 const socketioJwt   = require('socketio-jwt');
 const jwt = require('jsonwebtoken');
+const {initializePlayerStates} = require("../redisHelpers");
 const {getGameLog} = require("../redisHelpers");
 const {addToGameLog} = require("../redisHelpers");
 const {initializeTableRedis} = require("../redisHelpers");
@@ -497,10 +498,15 @@ class SessionManager extends TableManager {
         // this.previousTableState = null;
         // this.handEndLog.push({time: Date.now(), finalState: this.getPublicInfo()});
         // start new round
-        super.startRound();
-        this.sendTableState();
+        super.startRound(true, true);
         // initializes game ID to 'none' if no game is in progress
         await initializeGameRedis(this.table, this.sid);
+
+        if (this.table.game) { // predicate: this.table.game !== null === this.gameInProgress
+            this.table.dealPocketCards();
+            this.table.initializeBlinds();
+        }
+        this.sendTableState();
         if (!this.gameInProgress) {
             console.log('waiting for more players to rejoin!');
         } else {

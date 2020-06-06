@@ -361,11 +361,11 @@ class TableManager extends TableStateManager {
         return 'guest';
     }
 
-    startRound() {
+    startRound(disableDeal, disableBlinds) {
         this.gameInProgress = true;
         this.updateBlinds();
         this.updateQueuedStackChanges();
-        this.table.initNewRound();
+        this.table.initNewRound(disableDeal, disableBlinds);
         if (!this.table.game)
             this.gameInProgress = false;
     }
