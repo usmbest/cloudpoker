@@ -83,12 +83,20 @@ module.exports.getGameLog = getGameLog;
 
 const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
 const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(v => parseInt(v));
+const transformRngStateString = (stateString) =>  {
+    let vals = stateString.split(',');
+    let y = {};
+    for (let i = 0; i < vals.length; i+=2) {
+        y[vals[i]] = parseInt(vals[i+1]);
+    }
+    return y;
+}
 const transformPlayerState = (playerVal) => {
-    console.log('transformPlayerState', playerVal);
-    const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false', transformGolleNumberString(playerVal.golleNumbers));
+    const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false');
     p.inHand = playerVal.inHand !== 'false';
     p.standingUp = playerVal.standingUp !== 'false';
-    p.seed = playerVal.seed;
+    p.setRng(playerVal.seed, transformRngStateString(playerVal.rngState));
+    p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
 }
 async function getTableState(sid, gameId) {
@@ -196,6 +204,7 @@ const addPlayerArgs = (table, sid, p) => {
         'seat', p.seat,
         'seed', p.seed,
         'golleNumbers', convertGolleNumberArray(p.golleNumbers),
+        'rngState', Object.entries(p.rng.state()).flat().join(','),
     ];
     return args;
 }

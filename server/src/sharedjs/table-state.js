@@ -270,7 +270,7 @@ class Player {
      * @param isStraddling If the player wants to straddle
      * @constructor
      */
-    constructor(playerName, chips, isStraddling, seat, isMod, golleNumbers) {
+    constructor(playerName, chips, isStraddling, seat, isMod) {
         this.playerName = playerName;
         this.chips = chips;
         // If the player is in the current hand. False is they just joined and are waiting for the next hand.
@@ -288,8 +288,7 @@ class Player {
         this.seed = v4();
         this.clearHandState();
 
-        this._golleNumbers = golleNumbers || [];
-        this.fillGolleNumbers(); // fill _golleNumbers if necessary
+        this._golleNumbers = [];
     }
     getNextGolleNumber() {
         this.fillGolleNumbers(GOLLE_NUMBERS_DEFAULT_LENGTH + 1);
@@ -309,12 +308,19 @@ class Player {
         this._golleNumbers = v;
         this.fillGolleNumbers();
     }
+    get rng() {
+        return this._rng;
+    }
+    setRng(seed, state) {
+        this._seed = seed;
+        this._rng = seedrandom.xorwow('', {state});
+    }
     get seed() {
         return this._seed;
     }
     set seed(v) {
         this._seed = v;
-        this._rng = new seedrandom.xorwow(this._seed);
+        this._rng = seedrandom.xorwow(this._seed, {state: true});
     }
 
     showHand() {
