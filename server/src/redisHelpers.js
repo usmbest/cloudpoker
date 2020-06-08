@@ -54,6 +54,8 @@ module.exports.getGameStream = getGameStream;
 
 const transformLogStreamElement = (el) => {
     delete el.type;
+    if (el.seat) el.seat = parseInt(el.seat);
+    if (el.amount) el.amount = parseInt(el.amount);
     return el;
 }
 
@@ -81,6 +83,7 @@ async function getGameLog(sid, cursor) {
 }
 module.exports.getGameLog = getGameLog;
 
+const parseBool = (val) => val !== 'false';
 const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
 const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(v => parseInt(v));
 const convertRngStateObject = (obj) => Object.entries(obj).flat().join(',');
@@ -93,9 +96,9 @@ const transformRngStateString = (stateString) =>  {
     return y;
 }
 const transformPlayerState = (playerVal) => {
-    const p = new Player(playerVal.playerName, playerVal.chips, playerVal.isStraddling !== 'false', playerVal.seat, playerVal.isMod !== 'false');
-    p.inHand = playerVal.inHand !== 'false';
-    p.standingUp = playerVal.standingUp !== 'false';
+    const p = new Player(playerVal.playerName, parseInt(playerVal.chips), parseBool(playerVal.isStraddling), parseInt(playerVal.seat), parseBool(playerVal.isMod));
+    p.inHand = parseBool(playerVal.inHand);
+    p.standingUp = parseBool(playerVal.standingUp);
     p.setRng(playerVal.seed, transformRngStateString(playerVal.rngState));
     p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
@@ -124,17 +127,21 @@ async function getTableState(sid, gameId) {
         table.dealer = (table.dealer - 1) % table.players.length;
         table.initNewRound();
         table.game.id = gameId;
-        // sync actions
-        for (; i< gameStream.length; i++) {
-            let el = gameStream[i];
-            if (!(el.type === 'log' && el.logEvent === 'action')) continue;
-            if (el.action === 'setGolleNumbers') {
-                console.log('redis setGolleNumbers', el.values);
-                table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
-            } else {
-                prev_round = table.game.roundName.toLowerCase();
-                table.applyAction(el.seat, el.action, el.amount || 0);
-            }
+    }
+    // sync actions
+    for (; i< gameStream.length; i++) {
+        let el = gameStream[i];
+        if (!(el.type === 'log' && el.logEvent === 'action')) continue;
+        el = transformLogStreamElement(el);
+        // el.seat = parseInt(el.seat);
+        if (el.action === 'setGolleNumbers') {
+            // console.log('redis setGolleNumbers', el.values);
+            table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
+        } else {
+            // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
+            if (table.game) prev_round = table.game.roundName.toLowerCase();
+            // if (el.amount) el.amount = parseInt(el.amount);
+            table.applyAction(el.seat, el.action, el.amount || 0);
         }
     }
     return {table, prev_round};
