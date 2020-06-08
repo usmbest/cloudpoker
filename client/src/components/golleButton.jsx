@@ -8,9 +8,14 @@ class GolleInfo extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleClick = this.handleClick.bind(this);
     }
     newValues() {
         return Array(this.props.values.length).fill('');
+    }
+    handleClick(e) {
+        e.stopPropagation();
+        e.preventDefault();
     }
     handleChange(ind, event) {
         // because event is a synthetic event, target cannot be accessed asynchronously in setState
@@ -18,6 +23,7 @@ class GolleInfo extends Component {
         this.setState(prevState => ({values: [...prevState.values.slice(0, ind), value, ...prevState.values.slice(ind + 1)]}));
     }
     handleSubmit(e) {
+        e.stopPropagation();
         let newValues = [];
         for (let i = 0; i < this.state.values.length; i++) {
             let value = this.state.values[i];
@@ -76,7 +82,8 @@ class GolleInfo extends Component {
     }
 
     render() {
-        let golleInfoClassName = this.props.showInfo? "popuptext show": "popuptext";
+        let golleInfoClassName = "golle-dialog popuptext";
+        if (this.props.showInfo) golleInfoClassName += " show";
         const numberInput = (val, ind) => {
             let id = `golle-${ind}`;
             const onChange = (e) => {this.handleChange(ind, e)};
@@ -91,7 +98,7 @@ class GolleInfo extends Component {
             ))
         }
         return (
-            <div className={golleInfoClassName} id="golle-info">
+            <div className={golleInfoClassName} id="golle-info" onClick={this.handleClick}>
                 {rows}
                 <div className="button-primary" onClick={this.handleSubmit}>Submit</div>
             </div>
@@ -106,28 +113,21 @@ export default class GolleButton extends Component {
         this.state = {showInfo: false};
         this.toggleShowInfo = this.toggleShowInfo.bind(this);
         this.closeInfo = this.closeInfo.bind(this);
-        this.handleInfoMouseUp = this.handleInfoMouseUp.bind(this);
     }
     toggleShowInfo(e) {
-        if (e) e.stopPropagation();
+        e.stopPropagation();
         this.setState(prevState => ({showInfo: !prevState.showInfo}));
     }
     closeInfo(e) {
         if (e) e.stopPropagation();
         this.setState({showInfo: false});
     }
-    handleInfoMouseUp(e) {
-        e.stopPropagation();
-    }
     componentDidMount() {
-        window.addEventListener('mouseup', this.closeInfo);
-        document.getElementById('golle-info').addEventListener('mouseup', this.handleInfoMouseUp)
+        window.addEventListener('click', this.closeInfo);
     }
     componentWillUnmount() {
-        window.removeEventListener('mouseup', this.closeInfo);
-        document.getElementById('golle-info').removeEventListener('mouseup', this.handleInfoMouseUp)
+        window.removeEventListener('click', this.closeInfo);
     }
-
     render() {
         return (
             <div className="button popup" onClick={this.toggleShowInfo}>
