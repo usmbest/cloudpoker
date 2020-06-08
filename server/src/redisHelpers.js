@@ -133,14 +133,11 @@ async function getTableState(sid, gameId) {
         let el = gameStream[i];
         if (!(el.type === 'log' && el.logEvent === 'action')) continue;
         el = transformLogStreamElement(el);
-        // el.seat = parseInt(el.seat);
         if (el.action === 'setGolleNumbers') {
-            // console.log('redis setGolleNumbers', el.values);
             table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
         } else {
             // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
             if (table.game) prev_round = table.game.roundName.toLowerCase();
-            // if (el.amount) el.amount = parseInt(el.amount);
             table.applyAction(el.seat, el.action, el.amount || 0);
         }
     }
