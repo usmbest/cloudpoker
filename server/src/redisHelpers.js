@@ -83,6 +83,7 @@ module.exports.getGameLog = getGameLog;
 
 const convertGolleNumberArray = (golleNumbers) => golleNumbers.join(',');
 const transformGolleNumberString = (golleNumbersString) => golleNumbersString.split(',').map(v => parseInt(v));
+const convertRngStateObject = (obj) => Object.entries(obj).flat().join(',');
 const transformRngStateString = (stateString) =>  {
     let vals = stateString.split(',');
     let y = {};
@@ -204,7 +205,7 @@ const addPlayerArgs = (table, sid, p) => {
         'seat', p.seat,
         'seed', p.seed,
         'golleNumbers', convertGolleNumberArray(p.golleNumbers),
-        'rngState', Object.entries(p.rng.state()).flat().join(','),
+        'rngState', convertRngStateObject(p.rng.state()),
     ];
     return args;
 }
