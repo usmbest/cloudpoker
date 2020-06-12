@@ -103,6 +103,66 @@ const transformPlayerState = (playerVal) => {
     p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
 }
+async function getTables() {
+    let sids = await getSids();
+
+    let multi = client.multi();
+    sids.forEach(sid => multi.lindex(fmtGameListId(sid), 0));
+    let gameIds = await execMultiAsync(multi)();
+
+    multi = client.multi();
+    gameIds.forEach((gameId, index) => multi.hgetall(fmtGameStateId(sids[index], gameId)))
+    let gameVals = await execMultiAsync(multi)();
+
+    let result = [];
+    for (let i = 0; i < gameVals.length; i++) {
+        let sid = sids[i];
+        let gameId = gameIds[i];
+        let gameVal = gameVals[i];
+
+        let table = new poker.Table(parseInt(gameVal.smallBlind), parseInt(gameVal.bigBlind), 2, 10, 1, 500000000000, 0);
+        table.dealer = parseInt(gameVal.dealer);
+
+        let gameStream = await getGameStream(sid, gameId);
+        let timeStamps = gameStream.map(el => parseStreamElementId(el[0]));
+        gameStream = gameStream.map(formatStreamElement);
+        console.log('getTableState gameStream', gameStream);
+        let i;
+        for (i = 0; i < gameStream.length; i++) {
+            let playerVal = gameStream[i];
+            if (playerVal.type === 'playerState') {
+                table.allPlayers[i] = transformPlayerState(playerVal);
+            } else {
+                break; // if we have reached the action stream
+            }
+        }
+
+        let prev_round = null;
+        if (gameId !== 'none') {
+            table.dealer = (table.dealer - 1) % table.players.length;
+            table.initNewRound();
+            table.game.id = gameId;
+        }
+        let lastActionTime = parseInt(gameVal.startTime);
+        // sync actions
+        for (; i< gameStream.length; i++) {
+            let el = gameStream[i];
+            if (!(el.type === 'log' && el.logEvent === 'action')) continue;
+            el = transformLogStreamElement(el);
+            if (el.action === 'setGolleNumbers') {
+                table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
+            } else {
+                lastActionTime = timeStamps[i];
+                // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
+                if (table.game) prev_round = table.game.roundName.toLowerCase();
+                table.applyAction(el.seat, el.action, el.amount || 0);
+            }
+        }
+        result.push({table, lastActionTime, prev_round, sid});
+    }
+    return result;
+}
+module.exports.getTables = getTables;
 async function getTableState(sid, gameId) {
     gameId = gameId || await getGameIdForTable(sid);
     let gameVal = await getGameState(sid, gameId);
@@ -154,7 +214,7 @@ async function deleteTableOnRedis(sid) {
 }
 module.exports.deleteTableOnRedis = deleteTableOnRedis;
 
-const setInitialGameState = async (multi, table, sid, startTime) => {
+const setInitialGameState = (multi, table, sid, startTime) => {
     let gameStateArgs = [
         'gameId', table.game? table.game.id: 'none',
         'smallBlind', table.smallBlind,
@@ -218,7 +278,7 @@ module.exports.initializeTableRedis = initializeTableRedis;
 async function initializeGameRedis(table, sid, multi) {
     multi = multi || client.multi();
     let startTime = Date.now();
-    await setInitialGameState(multi, table, sid, startTime);
+    setInitialGameState(multi, table, sid, startTime);
     setInitialPlayerStates(multi, table, sid);
 
     await trimGameList(multi, sid, 40);

@@ -13,6 +13,7 @@ const {asyncErrorHandler, sleep, asyncSchemaValidator, formatJoiError} = require
 const poker = require('../poker-logic/lib/node-poker');
 const socketioJwt   = require('socketio-jwt');
 const jwt = require('jsonwebtoken');
+const {getTables} = require("../redisHelpers");
 const {initializePlayerStates} = require("../redisHelpers");
 const {getGameLog} = require("../redisHelpers");
 const {addToGameLog} = require("../redisHelpers");
@@ -113,11 +114,13 @@ router.route('/').post(asyncErrorHandler(async (req, res) => {
 // TODO: delete sid from sessionManagers when table finishes
 const sessionManagers = new Map();
 
+const TABLE_EXPIRY_TIMEOUT = 1000 * 60 * 30; // 30 minutes
 (async ()=>{
-    let sids = await getSids();
-    console.log('restarting tables with sids:', sids);
-    for (let sid of sids) {
-        let {table, prev_round} = await getTableState(sid);
+    let now = Date.now();
+    const isTableExpired = (lastActionTime) => now - lastActionTime > TABLE_EXPIRY_TIMEOUT;
+    let data = await getTables();
+    for (let {table, lastActionTime, prev_round, sid} of data) {
+        if (isTableExpired(lastActionTime)) continue;
         const pids = await getPlayerIdsForTable(sid);
         const tableNamespace = sio.of('/' + sid);
         let modIds = table.allPlayers.filter(p=>p!==null&&p.isMod).map(p=>pids[p.playerName].playerid);
@@ -149,7 +152,6 @@ const sessionManagers = new Map();
 //     }
 // }
 
-const TABLE_EXPIRY_TIMEOUT = 1000 * 60 * 30; // 30 minutes
 class SessionManager extends TableManager {
     constructor(io, sid, table, hostName, hostStack, hostIsStraddling, playerid, playerids, modIds) {
         super(sid, table, hostName, hostStack, hostIsStraddling, playerid, playerids, modIds);
