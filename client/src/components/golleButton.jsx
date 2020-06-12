@@ -99,6 +99,7 @@ class GolleInfo extends Component {
         }
         return (
             <div className={golleInfoClassName} id="golle-info" onClick={this.handleClick}>
+                {/*<a className="button-primary" target="_blank" rel="noopener noreferrer" href="http://your_url_here.html">What's this?</a>*/}
                 {rows}
                 <div className="button-primary" onClick={this.handleSubmit}>Submit</div>
             </div>
