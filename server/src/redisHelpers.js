@@ -154,16 +154,6 @@ async function deleteTableOnRedis(sid) {
 }
 module.exports.deleteTableOnRedis = deleteTableOnRedis;
 
-function getActiveGameIds() {
-    let sids = getSids();
-    let gameIds = [];
-    for (let sid of sids) {
-        gameIds.push(getGameIdForTable(sid));
-    }
-    return gameIds;
-}
-module.exports.getActiveGameIds = getActiveGameIds;
-
 const setInitialGameState = async (multi, table, sid, startTime) => {
     let gameStateArgs = [
         'gameId', table.game? table.game.id: 'none',
