@@ -144,7 +144,7 @@ const reconstructTable = (gameId, gameVal, gameStream) => {
 };
 async function getTables() {
     let sids = await getSids();
-
+    console.log('restarting tables with sids:', sids);
     let multi = client.multi();
     sids.forEach(sid => multi.lindex(fmtGameListId(sid), 0));
     let gameIds = await execMultiAsync(multi)();

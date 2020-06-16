@@ -14,7 +14,6 @@ const poker = require('../poker-logic/lib/node-poker');
 const socketioJwt   = require('socketio-jwt');
 const jwt = require('jsonwebtoken');
 const {getTables} = require("../redisHelpers");
-const {initializePlayerStates} = require("../redisHelpers");
 const {getGameLog} = require("../redisHelpers");
 const {addToGameLog} = require("../redisHelpers");
 const {initializeTableRedis} = require("../redisHelpers");
