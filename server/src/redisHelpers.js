@@ -103,6 +103,45 @@ const transformPlayerState = (playerVal) => {
     p.golleNumbers = transformGolleNumberString(playerVal.golleNumbers);
     return p;
 }
+const reconstructTable = (gameId, gameVal, gameStream) => {
+    let table = new poker.Table(parseInt(gameVal.smallBlind), parseInt(gameVal.bigBlind), 2, 10, 1, 500000000000, 0);
+    table.dealer = parseInt(gameVal.dealer);
+
+    let timeStamps = gameStream.map(el => parseStreamElementId(el[0]));
+    gameStream = gameStream.map(formatStreamElement);
+    console.log('getTableState gameStream', gameStream);
+    let i;
+    for (i = 0; i < gameStream.length; i++) {
+        let playerVal = gameStream[i];
+        if (playerVal.type === 'playerState') {
+            table.allPlayers[i] = transformPlayerState(playerVal);
+        } else {
+            break; // if we have reached the action stream
+        }
+    }
+    let prev_round = null;
+    if (gameId !== 'none') {
+        table.dealer = (table.dealer - 1) % table.players.length;
+        table.initNewRound();
+        table.game.id = gameId;
+    }
+    let lastActionTime = parseInt(gameVal.startTime);
+    // sync actions
+    for (; i< gameStream.length; i++) {
+        let el = gameStream[i];
+        if (!(el.type === 'log' && el.logEvent === 'action')) continue;
+        el = transformLogStreamElement(el);
+        if (el.action === 'setGolleNumbers') {
+            table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
+        } else {
+            lastActionTime = timeStamps[i];
+            // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
+            if (table.game) prev_round = table.game.roundName.toLowerCase();
+            table.applyAction(el.seat, el.action, el.amount || 0);
+        }
+    }
+    return {table, lastActionTime, prev_round};
+};
 async function getTables() {
     let sids = await getSids();
 
@@ -118,92 +157,13 @@ async function getTables() {
     for (let i = 0; i < gameVals.length; i++) {
         let sid = sids[i];
         let gameId = gameIds[i];
-        let gameVal = gameVals[i];
-
-        let table = new poker.Table(parseInt(gameVal.smallBlind), parseInt(gameVal.bigBlind), 2, 10, 1, 500000000000, 0);
-        table.dealer = parseInt(gameVal.dealer);
-
         let gameStream = await getGameStream(sid, gameId);
-        let timeStamps = gameStream.map(el => parseStreamElementId(el[0]));
-        gameStream = gameStream.map(formatStreamElement);
-        console.log('getTableState gameStream', gameStream);
-        let i;
-        for (i = 0; i < gameStream.length; i++) {
-            let playerVal = gameStream[i];
-            if (playerVal.type === 'playerState') {
-                table.allPlayers[i] = transformPlayerState(playerVal);
-            } else {
-                break; // if we have reached the action stream
-            }
-        }
-
-        let prev_round = null;
-        if (gameId !== 'none') {
-            table.dealer = (table.dealer - 1) % table.players.length;
-            table.initNewRound();
-            table.game.id = gameId;
-        }
-        let lastActionTime = parseInt(gameVal.startTime);
-        // sync actions
-        for (; i< gameStream.length; i++) {
-            let el = gameStream[i];
-            if (!(el.type === 'log' && el.logEvent === 'action')) continue;
-            el = transformLogStreamElement(el);
-            if (el.action === 'setGolleNumbers') {
-                table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
-            } else {
-                lastActionTime = timeStamps[i];
-                // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
-                if (table.game) prev_round = table.game.roundName.toLowerCase();
-                table.applyAction(el.seat, el.action, el.amount || 0);
-            }
-        }
+        let {table, lastActionTime, prev_round} = reconstructTable(gameIds[i], gameVals[i], gameStream);
         result.push({table, lastActionTime, prev_round, sid});
     }
     return result;
 }
 module.exports.getTables = getTables;
-async function getTableState(sid, gameId) {
-    gameId = gameId || await getGameIdForTable(sid);
-    let gameVal = await getGameState(sid, gameId);
-    let table = new poker.Table(parseInt(gameVal.smallBlind), parseInt(gameVal.bigBlind), 2, 10, 1, 500000000000, 0);
-    table.dealer = parseInt(gameVal.dealer);
-
-    let gameStream = await getGameStream(sid, gameId);
-    gameStream = gameStream.map(formatStreamElement);
-    console.log('getTableState gameStream', gameStream);
-    let i;
-    for (i = 0; i < gameStream.length; i++) {
-        let playerVal = gameStream[i];
-        if (playerVal.type === 'playerState') {
-            table.allPlayers[i] = transformPlayerState(playerVal);
-        } else {
-            break; // if we have reached the action stream
-        }
-    }
-
-    let prev_round = null;
-    if (gameId !== 'none') {
-        table.dealer = (table.dealer - 1) % table.players.length;
-        table.initNewRound();
-        table.game.id = gameId;
-    }
-    // sync actions
-    for (; i< gameStream.length; i++) {
-        let el = gameStream[i];
-        if (!(el.type === 'log' && el.logEvent === 'action')) continue;
-        el = transformLogStreamElement(el);
-        if (el.action === 'setGolleNumbers') {
-            table.allPlayers[el.seat].golleNumbers = transformGolleNumberString(el.values);
-        } else {
-            // if table.game is falsy, apply-able actions are removePlayer, sitDown, standUp, etc.
-            if (table.game) prev_round = table.game.roundName.toLowerCase();
-            table.applyAction(el.seat, el.action, el.amount || 0);
-        }
-    }
-    return {table, prev_round};
-}
-module.exports.getTableState = getTableState;
 
 async function deleteTableOnRedis(sid) {
     let multi = client.multi();
