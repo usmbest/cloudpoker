@@ -7,13 +7,16 @@ npm i redis-server
 npm -g uninstall redis-server
 
 C:\nodejs\node.exe .\server\src\index.js
-
+---------------------------------
+---------------------------------
+cd D:\pokerSrc\cloudpoker
+node  ./server/src/index.js
+---------------------------------
+---------------------------------
 
 cd D:\pokerSrc\cloudpoker\server\src
 d:
-
 node index.js
-
 
 cd D:\pokerSrc\cloudpoker\
 node .\server\src\index.js
@@ -27,6 +30,7 @@ redis-cli -version
 -----------------------------
 redis 윈도우 버전은 3ㅇ로 종료 stream 은 버전 5부터
 윈도우 서브 시스템 에 설치중 
+------
 wget http://download.redis.io/releases/redis-5.0.5.tar.gz
 tar xzf redis-5.0.5.tar.gz
 cd redis-5.0.5
@@ -37,6 +41,17 @@ cd deps
 make hiredis jemalloc linenoise lua geohash-int
 cd ..
 make
+src/redis-server
+------ or ------
+sudo apt install redis-server
+redis-cli -v
+    dev@Dev:~/redis-5.0.5$ redis-cli -v
+    redis-cli 5.0.7
+-- Redis 서버를 다시 시작
+sudo service redis-server restart
+--port : 6379
+--Redis 서버를 중지하려면
+sudo service redis-server stop
 ----------------------------
 D:\pokerSrc\cloudpoker>node --unhandled-rejections=strict .\server\src\index.js
 Starting server on port 8080
@@ -88,3 +103,29 @@ ReplyError: EXECABORT Transaction discarded because of previous errors.
 }
 
 D:\pokerSrc\cloudpoker>
+
+
+/////////////////////////////////////////
+---------------------------------
+1. Redis 이미지 가져오기
+docker pull redis
+2. 신규 Container 생성, 실행
+docker run --name redis-container -p 6379:6379 redis
+도커 컨테이너를 자동으로 재시작하고 싶다면 아래와 같은 옵션을 추가해주세요.
+docker run --name redis-container -p 6379:6379 -dit --restart unless-stopped redis
+3. 컨테이너에 터미널 접속
+docker exec -it redis-container /bin/bash
+4. 시작/중지/재시작
+docker start redis-container
+docker stop redis-container
+docker restart redis-container
+---------------------------------
+
+cd D:\pokerSrc\cloudpoker\
+d:
+node .\server\src\index.js
+
+cd D:\pokerSrc\cloudpoker\
+d:
+node .\client\src\index.js
+
