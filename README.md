@@ -129,3 +129,19 @@ cd D:\pokerSrc\cloudpoker\
 d:
 node .\client\src\index.js
 
+cd D:\pokerSrc\cloudpoker\server\
+d:
+node .\src\index.js
+
+
+
+
+크로스플랫폼 환경변수 설정
+
+dotenv 라이브러리# npm
+npm i -s dotenv
+# Yarn
+yarn add dotenv
+
+cd D:\pokerSrc\cloudpoker\
+.env  --> PKR_JWT_SECRET=
