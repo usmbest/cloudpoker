@@ -20,6 +20,7 @@ server/dist
 cert/
 hands/
 
+database.js
 client/package-lock.json
 server/package-lock.json
 util/

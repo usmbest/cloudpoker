@@ -145,3 +145,34 @@ yarn add dotenv
 
 cd D:\pokerSrc\cloudpoker\
 .env  --> PKR_JWT_SECRET=
+
+
+----- 2020-12-27
+cd /cloudpoker
+node ./server/src/index.js
+
+----- 2020-12-28
+sudo apt-get update
+sudo apt-get install mysql-server
+sudo apt-get install mysql-client
+sudo mysql_secure_installation
+sudo mysql -u root -p
+
+sudo apt-get install wine
+HeidiSQL 다운로드
+https://www.heidisql.com/download.php
+wine HeidiSQL_11.1.0.6116_Setup.exe
+
+============= mysql delete =============
+sudo /etc/init.d/mysql stop
+docker pull mysql:5.7
+docker images
+
+docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password --name ems_mysql mysql:5.7
+docker ps -a
+winpty docker exec -it ems_mysql //bin//bash
+
+//sudo docker start dingrr
+//sudo docker start ems_mysql
+node ./server/src/index.js
+
