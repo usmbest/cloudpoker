@@ -104,7 +104,9 @@ var user_nick         = ""; // user 닉네임
 var user_avata        = ""; // user 아바타 Default N
 var user_level        = 0; // 접속한 후 _levelUpTime 분당 + 1
 var user_ip           = "";
+var user_CTP          = "0"; // CTP valance
 var user_CTP_address  = ""; // CTP 입금 주소
+var user_PUB          = "0"; // CTP * 100
 var md5 = require('md5');
 
 // #############################################
@@ -113,16 +115,17 @@ const STATIC_PATH = path.join(__dirname, '../public')
 app.get('/', function(req, res) {
     if (user_id==""){
         res.sendFile(STATIC_PATH + '/ulogin.html')
+        return;
     }else{
         // res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
         // res.end(indexPage(user_id,user_nick,user_avata,user_level)); 
         // Login page for host
         // res.render('pages/login');
         // res.render('pages/login',{user_id:user_id,user_nick:user_nick,user_avata:user_avata,user_level:user_level});
-        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level));
+        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_PUB));
     }
 });
-function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level) {
+function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_PUB) {
     var render_json = new Object();
     render_json.title       = "title";
     render_json.user_id     = user_id;
@@ -130,6 +133,9 @@ function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level) {
     render_json.user_nick   = user_nick;
     render_json.user_avata  = user_avata;
     render_json.user_level  = user_level;
+    render_json.user_CTP    = user_CTP;
+    render_json.user_CTP_address  = user_CTP_address;
+    render_json.user_PUB    = user_PUB;
     return render_json;
 }
 // #############################################
@@ -163,15 +169,23 @@ app.post('/ulogin', function (req, res) {
           user_nick   = rows[0].nick;
           user_avata  = rows[0].avata;
           user_level  = rows[0].user_level;
+          user_CTP    = rows[0].CTP;
+          user_CTP    = parseFloat(user_CTP).toFixed(2);
+          user_PUB    = user_CTP * 100;
           user_CTP_address= rows[0].CTP_address;
+          console.log('유저CTP:'+user_CTP);
           console.log('유저레벨:'+user_level);
-          user_ip = req.headers['x-forwarded-for'] ||req.connection.remoteAddress ||req.socket.remoteAddress ||req.connection.socket.remoteAddress;
-          req.session.user_id = user_id; // 2020-01-02 session 
-          req.session.user_name = user_name; // 2020-01-02 session 
-          req.session.user_nick = user_nick; // 2020-01-02 session 
+          user_ip     = req.headers['x-forwarded-for'] ||req.connection.remoteAddress ||req.socket.remoteAddress ||req.connection.socket.remoteAddress;
+
+          req.session.user_id    = user_id; // 2020-01-02 session 
+          req.session.user_name  = user_name; // 2020-01-02 session 
+          req.session.user_nick  = user_nick; // 2020-01-02 session 
           req.session.user_avata = user_avata; // 2020-01-02 session 
           req.session.user_level = user_level; // 2020-01-02 session 
+          req.session.user_CTP   = user_CTP; // 2020-01-02 session 
           req.session.user_CTP_address = user_CTP_address; // 2020-01-02 session 
+          req.session.user_PUB   = user_PUB; // 2020-01-02 session 
+          
           //   intervalLvUpFunc();
           var sql2 = " "; 
           sql2 = sql2 + " INSERT INTO `tbl_game`(`game_idx`, `user_idx`, `user_coin`, `coin_address`, `yyyymmdd`, `ip`) ";

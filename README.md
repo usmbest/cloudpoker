@@ -117,6 +117,8 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password --name ems_mysql mysq
 docker ps -a
 winpty docker exec -it ems_mysql //bin//bash
 //start docker redis
+alias redis-flush="docker exec -it dingrr redis-cli FLUSHALL"
+docker exec -it dingrr redis-cli FLUSHALL
 sudo docker stop dingrr
 sudo docker start dingrr
 //start docker mysql
@@ -124,3 +126,15 @@ sudo docker start ems_mysql
 
 node ./server/src/index.js
 
+Stack (스택) : 자신 앞에 놓여 있는 칩을 스택이라고 표현한다.
+Straddle (스트레들)
+스트래들이란, UTG1자리에서 첫 순서 일 때 스몰, 빅 블라인드 이외에 추가로 의무 베팅을 내는 것. 예를 들어, UTG1 플레이어가 2장의 스타팅 핸드를 받기 전 "스트래들"을 외칠 경우 앞의 블라인드를 내는 플레이어들과 함께 같이 금액을 낸다. $1/$2 블라인드 $5 스트레들. 스트래들을 하는 이유는 기본 판돈을 높이고 프리플랍에 자신에게 마지막 순서가 돌아오기 때문이다.
+
+2021-01-03 ing  --> X
+/home/dev/cloudpoker/client/src/components/buyInButton.jsx 에 session 값 바인딩 테스트 중
+
+/home/dev/cloudpoker/server/src/server-logic.js
+    buyin(playerName, playerid, stack, isStraddling, seed) {
+        
+user_PUB [stack]  = CTP * 100 
+게임에 참가 하시려면 최소 1개 이상의 CTP를 보유 하셔야 합니다.

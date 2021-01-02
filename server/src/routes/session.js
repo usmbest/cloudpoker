@@ -7,6 +7,19 @@ router.use('/', cookieParser(process.env.COOKIE_SECRET));
 router.use('/:id', cookieParser(process.env.COOKIE_SECRET));
 
 const path = require('path');
+//#region 
+const STATIC_PATH = path.join(__dirname, './../../public')
+var db_config = require(__dirname + './../database.js');// 2020-09-13
+var session = require('express-session');  // 2020-01-02 session 
+var MySQLStore = require('express-mysql-session')(session);  // 2020-01-02 session 
+var sessionStore = new MySQLStore(db_config.constr());   // 2020-01-02 session 
+router.use(session({
+  secret:"ctpSessionk@y",
+  resave:false,
+  saveUninitialized:true,
+  store: sessionStore
+}));   // 2020-01-02 session 
+//#endregion
 const Joi = require('@hapi/joi');
 const shortid = require('shortid');
 const {TableManager} = require('../server-logic');
@@ -52,9 +65,6 @@ const validateTableName = (val) => {
 
 // Information host submits for game (name, stack, bb, sb)
 router.route('/').post(asyncErrorHandler(async (req, res) => {
-    // if (user_id==""){
-    //     res.sendFile(STATIC_PATH + '/ulogin.html')
-    // }
     //scheme to ensure valid username
     const schema = Joi.object({
         // username: Joi.string().alphanum().min(2).max(10)
@@ -548,14 +558,23 @@ class SessionManager extends TableManager {
 }
 
 router.route('/:id').get(asyncErrorHandler((req, res) => {
+    console.log('session.js 파라미터 >> session.user_id : '+req.session.user_id);
+    if (req.session.user_id=="" || req.session.user_id === undefined ){
+        res.sendFile(STATIC_PATH + '/ulogin.html');
+        return;
+    }
+
     let sid = req.params.id;
     const s = sessionManagers.get(sid);
+    console.log('session.js 파라미터 >> req.params.id : '+req.params.id);
+
     if (!s) { // redirect user to login page if the request's table ID does not exist
         res.redirect('/');
         return;
     }
 
     const playerId = getOrSetPlayerIdCookie(req, res);
+    console.log('session.js 파라미터 >> getOrSetPlayerIdCookie : '+playerId);
     const token = jwt.sign({playerId: playerId},
         process.env.PKR_JWT_SECRET, {expiresIn: "2 days"});
     res.render('pages/game', {
@@ -594,7 +613,7 @@ async function handleOnAuth(s, socket) {
         });
         // io.removeAllListeners('connection');
     });
-
+    //외부 링크로 들어오면 여기를 통과 함 2021-01-03
     console.log('a user connected at', socket.id, 'with player ID', playerId);
 
     const chatSchema = Joi.object({
