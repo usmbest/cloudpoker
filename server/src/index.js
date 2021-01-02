@@ -82,6 +82,7 @@ app.use(bodyParser.json());
 var db_config = require(__dirname + '/database.js');// 2020-09-13
 
 var user_id           = ""; // user idx
+var user_name         = ""; // user email
 var user_nick         = ""; // user 닉네임
 var user_avata        = ""; // user 아바타 Default N
 var user_level        = 0; // 접속한 후 _levelUpTime 분당 + 1
@@ -101,13 +102,14 @@ app.get('/', function(req, res) {
         // Login page for host
         // res.render('pages/login');
         // res.render('pages/login',{user_id:user_id,user_nick:user_nick,user_avata:user_avata,user_level:user_level});
-        res.render('pages/login', get_user_info_json(user_id,user_nick,user_avata,user_level));
+        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level));
     }
 });
-function get_user_info_json(user_id,user_nick,user_avata,user_level) {
+function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level) {
     var render_json = new Object();
     render_json.title       = "title";
     render_json.user_id     = user_id;
+    render_json.user_name   = user_name;
     render_json.user_nick   = user_nick;
     render_json.user_avata  = user_avata;
     render_json.user_level  = user_level;
@@ -140,6 +142,7 @@ app.post('/ulogin', function (req, res) {
         //for(var i=0; i<rows.length; i++){ console.log(i+':i / '+rows[i].username +'-'+ rows[i].CTP_address +'-'+ rows[i].id +'-'+ rows[i].nick); }
         if(rows.length>0){
           user_id     = rows[0].id;
+          user_name   = rows[0].username;
           user_nick   = rows[0].nick;
           user_avata  = rows[0].avata;
           user_level  = rows[0].user_level;

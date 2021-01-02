@@ -6,12 +6,10 @@
     <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-124761032-2"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-
         function gtag() {
             dataLayer.push(arguments);
         }
         gtag('js', new Date());
-
         gtag('config', 'UA-124761032-2');
     </script> -->
 
@@ -29,14 +27,13 @@
         <h2>[<%=user_nick%>] welcome to ctp poker</h2>
     </section>
 
-
     <main>
         <p>set up your private game</p>
         <form id="login-form">
             <!-- <input class="u-full-width" required name="username" id="username" type="text" required="" placeholder="username">
             <input class="u-full-width" required name="password" id="password" type="password" required=""  placeholder="password"> -->
 
-            <input class="u-full-width" required type="text" id="name" name="name" minlength="2" maxlength="9" placeholder="Name">
+            <input class="u-full-width" required type="text" id="name" name="name" minlength="2" maxlength="9" placeholder="Name" value="U<%=user_id%>">
             <input class="u-full-width" type="number" id="stack" name="stack" placeholder="Starting Stack">
             <div class="row">
                 <div class="six columns">
@@ -47,7 +44,7 @@
                     <input class="u-full-width" type="number" id="big-blind" name="big-blind" min=0 placeholder="Big Blind">
                 </div>
             </div>
-            <input class="u-full-width" type="text" id="table-name" name="table-name" minlength="2" maxlength="15" placeholder="Table Name (optional)">
+            <input class="u-full-width" type="text" id="table-name" name="table-name" minlength="2" maxlength="15" placeholder="Table Name (optional)" value="T<%=user_id%>">
             <div class="row">
                 <div class="six columns">
                     <label class="straddle" id="straddle">
@@ -62,10 +59,14 @@
                     </label>
                 </div>
             </div>
-            <button class="u-full-width button-primary">Create Game</button>
+            <button class="u-full-width button-primary" id="btn_makeGame">Create Game</button>
         </form>
     </main>
     <script src="../client/dist/login.bundle.js"></script>
+    <script>
+        var _btn_makeGame = document.getElementById('btn_makeGame');
+        _btn_makeGame.click();
+    </script>
 </body>
 
 </html>
