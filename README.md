@@ -82,6 +82,12 @@ npm i -s dotenv
 # Yarn
 yarn add dotenv
 
+cd ~/cloudpoker/client
+yarn build
+<!-- yarn init -y
+yarn add webpack webpack-cli --dev
+webpack --config webpack.config.js -->
+
 cd D:\pokerSrc\cloudpoker\
 .env  --> PKR_JWT_SECRET=
 
@@ -111,6 +117,7 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password --name ems_mysql mysq
 docker ps -a
 winpty docker exec -it ems_mysql //bin//bash
 //start docker redis
+sudo docker stop dingrr
 sudo docker start dingrr
 //start docker mysql
 sudo docker start ems_mysql

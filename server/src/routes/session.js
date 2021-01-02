@@ -52,6 +52,9 @@ const validateTableName = (val) => {
 
 // Information host submits for game (name, stack, bb, sb)
 router.route('/').post(asyncErrorHandler(async (req, res) => {
+    // if (user_id==""){
+    //     res.sendFile(STATIC_PATH + '/ulogin.html')
+    // }
     //scheme to ensure valid username
     const schema = Joi.object({
         // username: Joi.string().alphanum().min(2).max(10)

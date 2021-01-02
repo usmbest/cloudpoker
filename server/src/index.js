@@ -42,6 +42,11 @@ app.use('/sharedjs', express.static(__dirname + '/sharedjs'));
 // app.use(loginRouter);
 // #############################################
 
+//handling sessions
+const sessionRouter = require('./routes/session');
+app.use('/session', sessionRouter);
+
+
 //#region ######### 2021-01-01 mod user login start #########
 
 /////////////////////////////////////////////////////
@@ -68,6 +73,8 @@ app.use('/sharedjs', express.static(__dirname + '/sharedjs'));
 //npm install ejs
 //cd ~/cloudpoker/server
 //npm install --save express-session
+// 2020-01-02 session  cd ~/cloudpoker/server
+//npm install --save express-mysql-session
 //npm install --save cookie-parser
 //npm install --save express-error-handler
 //npm install --save md5
@@ -80,6 +87,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // html request 받기위해 end @@@@@@
 var db_config = require(__dirname + '/database.js');// 2020-09-13
+
+var session = require('express-session');  // 2020-01-02 session 
+var MySQLStore = require('express-mysql-session')(session);  // 2020-01-02 session 
+var sessionStore = new MySQLStore(db_config.constr());   // 2020-01-02 session 
+app.use(session({
+  secret:"ctpSessionk@y",
+  resave:false,
+  saveUninitialized:true,
+  store: sessionStore
+}));   // 2020-01-02 session 
 
 var user_id           = ""; // user idx
 var user_name         = ""; // user email
@@ -149,7 +166,13 @@ app.post('/ulogin', function (req, res) {
           user_CTP_address= rows[0].CTP_address;
           console.log('유저레벨:'+user_level);
           user_ip = req.headers['x-forwarded-for'] ||req.connection.remoteAddress ||req.socket.remoteAddress ||req.connection.socket.remoteAddress;
-        //   intervalLvUpFunc();
+          req.session.user_id = user_id; // 2020-01-02 session 
+          req.session.user_name = user_name; // 2020-01-02 session 
+          req.session.user_nick = user_nick; // 2020-01-02 session 
+          req.session.user_avata = user_avata; // 2020-01-02 session 
+          req.session.user_level = user_level; // 2020-01-02 session 
+          req.session.user_CTP_address = user_CTP_address; // 2020-01-02 session 
+          //   intervalLvUpFunc();
           var sql2 = " "; 
           sql2 = sql2 + " INSERT INTO `tbl_game`(`game_idx`, `user_idx`, `user_coin`, `coin_address`, `yyyymmdd`, `ip`) ";
           sql2 = sql2 + " VALUES (2,?,'CTP',?,CURDATE()+0,?) ";
@@ -168,8 +191,13 @@ app.post('/ulogin', function (req, res) {
           // login 성공
         //   res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
         //   res.end(indexPage(user_id,user_nick,user_avata,user_level)); 
+            //세션 스토어가 이루어진 후 redirect를 해야함.  // 2020-01-02 session 
+            req.session.save(function(){
+              // rsp.redirect('/');
+            });
             res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
             res.end("<script>document.location.href='/';</script>"); 
+            
         }else{
           res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
           res.end("<script>alert('password maybe wrong');document.location.href='/';</script>"); 
@@ -183,17 +211,13 @@ app.post('/ulogin', function (req, res) {
 ////#endregion  ######### 2021-01-01 mod user login end #########
 
 
-//handling sessions
-const sessionRouter = require('./routes/session');
-app.use('/session', sessionRouter);
-
 // Starts the server.
 server.listen(port, function () {
-    console.log(`Starting server on port ${port}`);
+  console.log(`Starting server on port ${port}`);
 });
 
 // 404 pages
 app.use(function (req, res) {
-    res.status(404).render('pages/404');
+  res.status(404).render('pages/404');
 });
 
