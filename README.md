@@ -130,11 +130,28 @@ Stack (스택) : 자신 앞에 놓여 있는 칩을 스택이라고 표현한다
 Straddle (스트레들)
 스트래들이란, UTG1자리에서 첫 순서 일 때 스몰, 빅 블라인드 이외에 추가로 의무 베팅을 내는 것. 예를 들어, UTG1 플레이어가 2장의 스타팅 핸드를 받기 전 "스트래들"을 외칠 경우 앞의 블라인드를 내는 플레이어들과 함께 같이 금액을 낸다. $1/$2 블라인드 $5 스트레들. 스트래들을 하는 이유는 기본 판돈을 높이고 프리플랍에 자신에게 마지막 순서가 돌아오기 때문이다.
 
-2021-01-03 ing  --> X
+user_POT [stack]  = CTP * 100 
+게임에 참가 하시려면 최소 1개 이상의 CTP를 보유 하셔야 합니다.
+
+
+2021-01-03 ing  --> X JOIN GAME
+/home/dev/cloudpoker/client/src/index.js  --> import Header from "./components/header";
+/home/dev/cloudpoker/client/src/components/header.jsx --> import BuyInButton from "./buyInButton";
 /home/dev/cloudpoker/client/src/components/buyInButton.jsx 에 session 값 바인딩 테스트 중
+    readOnly="true" 
+    <input className="u-max-full-width" name="playerName" type="text" value={this.state.playerName} onChange={this.handleInputChange} placeholder="name" min="2" max="10" id="new-playerName"/>
+    <input className="u-max-full-width" name="stackSize" type="number" value={this.state.stackSize} onChange={this.handleInputChange} placeholder="stack size" min="1" id="new-stack"/>
+/home/dev/cloudpoker/server/src/routes/session.js
+    router.route('/:id').get(asyncErrorHandler((req, res) => {
+        res.render('pages/game', {
+            //2021-01-03 add 
+        ,user_id:req.session.user_id  ......
+
 
 /home/dev/cloudpoker/server/src/server-logic.js
     buyin(playerName, playerid, stack, isStraddling, seed) {
-        
-user_PUB [stack]  = CTP * 100 
-게임에 참가 하시려면 최소 1개 이상의 CTP를 보유 하셔야 합니다.
+
+new-playerName jsfn_bind_user 바인딩 실패
+/home/dev/cloudpoker/server/views/pages/game.ejs
+
+

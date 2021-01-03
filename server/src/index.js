@@ -42,9 +42,6 @@ app.use('/sharedjs', express.static(__dirname + '/sharedjs'));
 // app.use(loginRouter);
 // #############################################
 
-//handling sessions
-const sessionRouter = require('./routes/session');
-app.use('/session', sessionRouter);
 
 
 //#region ######### 2021-01-01 mod user login start #########
@@ -106,14 +103,14 @@ var user_level        = 0; // 접속한 후 _levelUpTime 분당 + 1
 var user_ip           = "";
 var user_CTP          = "0"; // CTP valance
 var user_CTP_address  = ""; // CTP 입금 주소
-var user_PUB          = "0"; // CTP * 100
+var user_POT          = "0"; // CTP * 100
 var md5 = require('md5');
 
 // #############################################
 app.use(express.static('public'));
 const STATIC_PATH = path.join(__dirname, '../public')
 app.get('/', function(req, res) {
-    if (user_id==""){
+    if (req.session.user_id=="" || req.session.user_id === undefined ){
         res.sendFile(STATIC_PATH + '/ulogin.html')
         return;
     }else{
@@ -122,10 +119,10 @@ app.get('/', function(req, res) {
         // Login page for host
         // res.render('pages/login');
         // res.render('pages/login',{user_id:user_id,user_nick:user_nick,user_avata:user_avata,user_level:user_level});
-        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_PUB));
+        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT));
     }
 });
-function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_PUB) {
+function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT) {
     var render_json = new Object();
     render_json.title       = "title";
     render_json.user_id     = user_id;
@@ -135,7 +132,7 @@ function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,us
     render_json.user_level  = user_level;
     render_json.user_CTP    = user_CTP;
     render_json.user_CTP_address  = user_CTP_address;
-    render_json.user_PUB    = user_PUB;
+    render_json.user_POT    = user_POT;
     return render_json;
 }
 // #############################################
@@ -171,7 +168,7 @@ app.post('/ulogin', function (req, res) {
           user_level  = rows[0].user_level;
           user_CTP    = rows[0].CTP;
           user_CTP    = parseFloat(user_CTP).toFixed(2);
-          user_PUB    = user_CTP * 100;
+          user_POT    = user_CTP * 100;
           user_CTP_address= rows[0].CTP_address;
           console.log('유저CTP:'+user_CTP);
           console.log('유저레벨:'+user_level);
@@ -184,7 +181,7 @@ app.post('/ulogin', function (req, res) {
           req.session.user_level = user_level; // 2020-01-02 session 
           req.session.user_CTP   = user_CTP; // 2020-01-02 session 
           req.session.user_CTP_address = user_CTP_address; // 2020-01-02 session 
-          req.session.user_PUB   = user_PUB; // 2020-01-02 session 
+          req.session.user_POT   = user_POT; // 2020-01-02 session 
           
           //   intervalLvUpFunc();
           var sql2 = " "; 
@@ -223,6 +220,10 @@ app.post('/ulogin', function (req, res) {
 
 
 ////#endregion  ######### 2021-01-01 mod user login end #########
+
+//handling sessions
+const sessionRouter = require('./routes/session');
+app.use('/session', sessionRouter);
 
 
 // Starts the server.

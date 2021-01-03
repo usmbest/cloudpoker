@@ -6,6 +6,14 @@
     <script>
         const SESSION_ID = '<%=sid%>';
         localStorage.setItem('token', '<%=token%>');
+        var _user_id            =  '<%=user_id%>';
+        var _user_name          =  '<%=user_name%>';
+        var _user_nick          =  '<%=user_nick%>';
+        var _user_avata         =  '<%=user_avata%>';
+        var _user_level         =  '<%=user_level%>';
+        var _user_CTP           =  '<%=user_CTP%>';
+        var _user_CTP_address   =  '<%=user_CTP_address%>';
+        var _user_POT           =  '<%=user_POT%>';
     </script>
 </head>
 
@@ -32,6 +40,20 @@
             <div id="below-table-root"></div>
         </div>
     </div>
+    <script>
+        function jsfn_bind_user(){
+            //alert('jsfn_bind_user');
+            try{
+                var _playerName = document.getElementById("new-playerName");
+                var _playerstack = document.getElementById("new-stack");
+                _playerName.value     =_user_id;
+                _playerstack.value    =_user_POT;
+                
+            }catch(e){
+                // alert(e);
+            }
+        }
+    </script>
     <script src="../client/dist/game.bundle.js"></script>
 </body>
 

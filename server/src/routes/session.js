@@ -580,6 +580,15 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
     res.render('pages/game', {
         sid: sid,
         token: token
+        //2021-01-03 add 
+        ,user_id:req.session.user_id
+        ,user_name:req.session.user_name
+        ,user_nick:req.session.user_nick
+        ,user_avata:req.session.user_avata
+        ,user_level:req.session.user_level
+        ,user_CTP:req.session.user_CTP
+        ,user_CTP_address:req.session.user_CTP_address
+        ,user_POT:req.session.user_POT
     });
 }));
 

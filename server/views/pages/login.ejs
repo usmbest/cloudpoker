@@ -34,7 +34,7 @@
             <input class="u-full-width" required name="password" id="password" type="password" required=""  placeholder="password"> -->
 
             <input class="u-full-width" required type="text" id="name" name="name" minlength="2" maxlength="9" placeholder="Name" value="U<%=user_id%>" readonly >
-            <input class="u-full-width" type="number" id="stack" name="stack" placeholder="Starting Stack" value="<%=user_PUB%>" readonly >
+            <input class="u-full-width" type="number" id="stack" name="stack" placeholder="Starting Stack" value="<%=user_POT%>" readonly >
             <div class="row">
                 <div class="six columns">
                     <input class="u-full-width" type="number" id="small-blind" name="small-blind" min=0
@@ -65,8 +65,8 @@
     <script src="../client/dist/login.bundle.js"></script>
     <script>
         var _btn_makeGame = document.getElementById('btn_makeGame');
-        var _user_PUB = parseFloat("<%=user_PUB%>").toFixed(0);
-        if(_user_PUB>0){
+        var _user_POT = parseFloat("<%=user_POT%>").toFixed(0);
+        if(_user_POT>0){
             _btn_makeGame.click();
         }else{
             _btn_makeGame.style.display="none";
