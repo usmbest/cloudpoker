@@ -41,17 +41,18 @@
         </div>
     </div>
     <script>
+        window.onload = function () 
+        {
+            setTimeout( jsfn_bind_user(), 2000);
+        }
         function jsfn_bind_user(){
-            //alert('jsfn_bind_user');
             try{
-                var _playerName = document.getElementById("new-playerName");
-                var _playerstack = document.getElementById("new-stack");
-                _playerName.value     =_user_id;
-                _playerstack.value    =_user_POT;
-                
+                document.getElementById("new-playerName").value = _user_id;
+                document.getElementById("new-stack").value = _user_POT;
             }catch(e){
                 // alert(e);
             }
+            // console.log('/server/views/pages/game.ejs : jsfn_bind_user()');
         }
     </script>
     <script src="../client/dist/game.bundle.js"></script>
