@@ -113,14 +113,14 @@ app.get('/', function(req, res) {
     if (req.session.user_id=="" || req.session.user_id === undefined ){
         res.sendFile(STATIC_PATH + '/ulogin.html')
         return;
-    }else{
-        // res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
-        // res.end(indexPage(user_id,user_nick,user_avata,user_level)); 
-        // Login page for host
-        // res.render('pages/login');
-        // res.render('pages/login',{user_id:user_id,user_nick:user_nick,user_avata:user_avata,user_level:user_level});
-        res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT));
     }
+    // else{
+    //     // res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
+    //     // res.end(indexPage(user_id,user_nick,user_avata,user_level)); 
+    //     // Login page for host
+    //     // res.render('pages/login');
+    //     res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT));
+    // }
 });
 function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT) {
     var render_json = new Object();
@@ -136,6 +136,11 @@ function get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,us
     return render_json;
 }
 // #############################################
+
+app.post('/', function(req, res) {
+  res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT));
+});
+
 
 // // post 로 넘어 오면 !!! 게임
 app.post('/ulogin', function (req, res) {
@@ -203,12 +208,14 @@ app.post('/ulogin', function (req, res) {
         //   res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
         //   res.end(indexPage(user_id,user_nick,user_avata,user_level)); 
             //세션 스토어가 이루어진 후 redirect를 해야함.  // 2020-01-02 session 
-            req.session.save(function(){
-              // rsp.redirect('/');
+            req.session.save(function() {
+              // session saved
+              // console.log('session.save err :' + err);
             });
             res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
-            res.end("<script>document.location.href='/';</script>"); 
-            
+            res.end("<html lang='en'><head><title>temp</title></head><body onload='document.frm.submit();'><form id='frm' name='frm' method='post' action='/'><input type='hidden' name='loginok' id='loginok' value='loginok'></form></body></html>");
+            // res.end("<script>document.location.href='/';</script>");
+            // res.render('pages/login', get_user_info_json(user_id,user_name,user_nick,user_avata,user_level,user_CTP,user_CTP_address,user_POT));
         }else{
           res.writeHead("200", {"Content-Type":"text/html;charset=utf-8"});
           res.end("<script>alert('password maybe wrong');document.location.href='/';</script>"); 

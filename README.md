@@ -64,9 +64,6 @@ cd D:\pokerSrc\cloudpoker\
 d:
 node .\server\src\index.js
 
-cd D:\pokerSrc\cloudpoker\
-d:
-node .\client\src\index.js
 
 cd D:\pokerSrc\cloudpoker\server\
 d:
@@ -119,6 +116,12 @@ winpty docker exec -it ems_mysql //bin//bash
 //start docker redis
 alias redis-flush="docker exec -it dingrr redis-cli FLUSHALL"
 docker exec -it dingrr redis-cli FLUSHALL
+----------------------------
+cd D:\WWW\cloudpoker
+d:
+docker exec -it redis-container redis-cli FLUSHALL
+node .\server\src\index.js
+----------------------------
 sudo docker stop dingrr
 sudo docker start dingrr
 //start docker mysql
