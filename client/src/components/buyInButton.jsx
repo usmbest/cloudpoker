@@ -70,10 +70,10 @@ class BuyInInfo extends Component {
         let buyInInfoClassName = this.props.showBuyInInfo? "popuptext show": "popuptext";
         return (
             <div className={buyInInfoClassName} id="buyin-info">
-                <div className="row" style="display:block;">
+                <div className="row">
                     <input className="u-max-full-width" id="new-playerName" name="playerName" type="text" value={this.state.playerName} onChange={this.handleInputChange} placeholder="name" min="2" max="10" />
                 </div>
-                <div className="row" style="display:block;">
+                <div className="row">
                     <input className="u-max-full-width" id="new-stack" name="stackSize" type="number" value={this.state.stackSize} onChange={this.handleInputChange} placeholder="stack size" min="1" />
                 </div>
                 <div className="button-primary" id="buyin-btn" onClick={this.handleSubmit}>Submit</div>

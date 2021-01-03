@@ -79,8 +79,11 @@ npm i -s dotenv
 # Yarn
 yarn add dotenv
 
+---------------------------------------------------------------------------------------------------------
 cd ~/cloudpoker/client
+npm i webpack@4.44.2 webpack-cli@3.3.12 html-webpack-plugin webpack-dev-server path --save-dev
 yarn build
+---------------------------------------------------------------------------------------------------------
 <!-- yarn init -y
 yarn add webpack webpack-cli --dev
 webpack --config webpack.config.js -->
@@ -156,5 +159,4 @@ user_POT [stack]  = CTP * 100
 
 new-playerName jsfn_bind_user 바인딩 실패
 /home/dev/cloudpoker/server/views/pages/game.ejs
-
 
