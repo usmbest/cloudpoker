@@ -82,7 +82,12 @@ yarn add dotenv
 ---------------------------------------------------------------------------------------------------------
 cd ~/cloudpoker/client
 npm i webpack@4.44.2 webpack-cli@3.3.12 html-webpack-plugin webpack-dev-server path --save-dev
+
 yarn build
+
+cd ~/cloudpoker/
+node ./server/src/index.js
+
 ---------------------------------------------------------------------------------------------------------
 <!-- yarn init -y
 yarn add webpack webpack-cli --dev
@@ -159,4 +164,8 @@ user_POT [stack]  = CTP * 100
 
 new-playerName jsfn_bind_user 바인딩 실패
 /home/dev/cloudpoker/server/views/pages/game.ejs
+
+[tbl] users --> POT INT add
+user_POT [stack]  = CTP * 100
+최대 POT 갯수 90000 개 정도로 제한 900 CTP = 90000 POT
 

@@ -19,7 +19,7 @@ class BuyInInfo extends Component {
         });
     }
     handleSubmit() {
-        console.log('here!');
+        console.log('/client/src/components/buyInButton.jsx handleSubmit!');
         let regex = RegExp(/^\w+(?:\s+\w+)*$/);
         let playerName = this.state.playerName.trim();
         let newStack = this.state.stackSize;
@@ -68,6 +68,8 @@ class BuyInInfo extends Component {
 
     render() {
         let buyInInfoClassName = this.props.showBuyInInfo? "popuptext show": "popuptext";
+        this.state.playerName = 'U'+_user_id;
+        this.state.stackSize = _user_POT;
         return (
             <div className={buyInInfoClassName} id="buyin-info">
                 <div className="row">

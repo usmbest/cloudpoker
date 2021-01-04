@@ -151,7 +151,7 @@ app.post('/ulogin', function (req, res) {
     
     var conn = db_config.init();//2020-09-13
     db_config.connect(conn);
-    var sql = "SELECT a.* , (SELECT IFNULL(sum(minuteCnt),0) FROM tbl_game WHERE game_idx='1' and user_idx=a.id) as user_level FROM users a WHERE username ='"+param_username+"' and password ='"+md5(param_password)+"'";
+    var sql = "SELECT a.* , (SELECT IFNULL(sum(minuteCnt),0) FROM tbl_game WHERE game_idx='3' and user_idx=a.id) as user_level FROM users a WHERE username ='"+param_username+"' and password ='"+md5(param_password)+"'";
     // console.log(sql);
     conn.query(sql, function (err, rows, fields) 
     {
@@ -173,10 +173,10 @@ app.post('/ulogin', function (req, res) {
           user_level  = rows[0].user_level;
           user_CTP    = rows[0].CTP;
           user_CTP    = parseFloat(user_CTP).toFixed(2);
-          user_POT    = user_CTP * 100;
+          user_POT    = rows[0].POT; // 2020-01-04 DB change
           user_CTP_address= rows[0].CTP_address;
           console.log('유저CTP:'+user_CTP);
-          console.log('유저레벨:'+user_level);
+          // console.log('유저레벨:'+user_level);
           user_ip     = req.headers['x-forwarded-for'] ||req.connection.remoteAddress ||req.socket.remoteAddress ||req.connection.socket.remoteAddress;
 
           req.session.user_id    = user_id; // 2020-01-02 session 
@@ -191,7 +191,7 @@ app.post('/ulogin', function (req, res) {
           //   intervalLvUpFunc();
           var sql2 = " "; 
           sql2 = sql2 + " INSERT INTO `tbl_game`(`game_idx`, `user_idx`, `user_coin`, `coin_address`, `yyyymmdd`, `ip`) ";
-          sql2 = sql2 + " VALUES (2,?,'CTP',?,CURDATE()+0,?) ";
+          sql2 = sql2 + " VALUES (3,?,'CTP',?,CURDATE()+0,?) ";
           sql2 = sql2 + " ON DUPLICATE KEY UPDATE minuteCnt = minuteCnt + 1, last_time=now() "; //무조건 +1 되는 버그로 Merge 문 X 
           var params = [rows[0].id, rows[0].CTP_address, user_ip];
           conn.query(sql2, params, function(err, rows2, fields2){
