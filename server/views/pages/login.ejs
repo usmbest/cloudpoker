@@ -66,11 +66,12 @@
     <script>
         var _btn_makeGame = document.getElementById('btn_makeGame');
         var _user_POT = parseFloat("<%=user_POT%>").toFixed(0);
-        if(_user_POT>0){
+        if(_user_POT>99){
             _btn_makeGame.click();
         }else{
             _btn_makeGame.style.display="none";
-            alert('게임에 참가 하시려면 최소 1개 이상의 CTP를 보유 하셔야 합니다.');
+            alert('게임에 참가 하시려면 최소 100개 이상의 POT를 보유 하셔야 합니다.\n1 CTP = 100 POT로 교환 가능합니다.');
+            document.location.href="http://exc.citypay.org";
         }
     </script>
 </body>
