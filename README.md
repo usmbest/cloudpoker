@@ -169,3 +169,16 @@ new-playerName jsfn_bind_user 바인딩 실패
 user_POT [stack]  = CTP * 100
 최대 POT 갯수 90000 개 정도로 제한 900 CTP = 90000 POT
 
+
+Object.entries(...).flat is not a function
+/home/dev/cloudpoker/server/src/routes/session.js --> Infinity add
+            ...Object.entries(state).flat()
+/home/dev/cloudpoker/server/src/redisHelpers.js  --> Infinity add
+            ...Object.entries(state).flat()
+
+.env
+PKR_LOG=/home/dev/cloudpoker/server/poker.log
+NODE_ENV=production
+PUBLIC_URL=
+PORT=8080
+DEBUG=false

@@ -69,7 +69,7 @@ class BuyInInfo extends Component {
     render() {
         let buyInInfoClassName = this.props.showBuyInInfo? "popuptext show": "popuptext";
         this.state.playerName = 'U'+_user_id;
-        this.state.stackSize = _user_POT;
+        this.state.stackSize = parseInt(_user_POT);
         return (
             <div className={buyInInfoClassName} id="buyin-info">
                 <div className="row">
