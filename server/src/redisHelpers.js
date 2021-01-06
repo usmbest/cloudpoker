@@ -168,7 +168,9 @@ const setRngState = (multi, table, sid) => {
         let state = table.initialRngState;
         let args = [
             'type', 'rngState',
-            ...Object.entries(state).flat()
+             ...Object.entries(state).flat() // org
+            // [].concat(...Object.entries(state)) // 1 st
+            // [].concat.apply([], ...Object.entries(state)) // 2 nd
         ]
         multi.xadd(fmtGameStreamId(sid, table.game.id), '*', ...args);
         TableLogger.addOp(sid, 'rngState', args);

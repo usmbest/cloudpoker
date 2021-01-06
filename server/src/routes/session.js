@@ -477,7 +477,10 @@ class SessionManager extends TableManager {
 
     async addToGameLog(logEvent, args, emittedArgs) {
         this.io.emit(logEvent, emittedArgs || args);
-        await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, ...Object.entries(args || {}).flat());
+        //...Object.entries(args || {}).flat() --> [].concat(...Object.entries(args || {}))
+        // await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, [].concat(...Object.entries(args || {}))); // 1st
+        //await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, [].concat.apply([], ...Object.entries(args || {}))); // 2dn
+        await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, ...Object.entries(args || {}).flat()); // org
     }
 
     async check_round (prev_round) {
