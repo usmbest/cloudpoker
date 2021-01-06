@@ -182,3 +182,6 @@ NODE_ENV=production
 PUBLIC_URL=
 PORT=8080
 DEBUG=false
+
+2021-01-06
+    ...args --> [].concat(...args)
