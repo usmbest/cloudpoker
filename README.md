@@ -185,3 +185,10 @@ DEBUG=false
 
 2021-01-06
     ...args --> [].concat(...args)
+
+cd D:\WWW\cloudpoker
+d:
+forever start -l webSvr.log --minUptime 5000 --spinSleepTime 2000 -aw .\server\src\index.js
+forever list
+forever stop 0
+forever start 0
