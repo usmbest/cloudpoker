@@ -84,9 +84,13 @@ cd ~/cloudpoker/client
 npm i webpack@4.44.2 webpack-cli@3.3.12 html-webpack-plugin webpack-dev-server path --save-dev
 
 yarn build
-
+---------------------------
+docker exec -it dingrr redis-cli FLUSHALL
+cd ~/cloudpoker/client
+yarn build
 cd ~/cloudpoker/
 node ./server/src/index.js
+---------------------------
 
 ---------------------------------------------------------------------------------------------------------
 <!-- yarn init -y
@@ -158,6 +162,8 @@ user_POT [stack]  = CTP * 100
             //2021-01-03 add 
         ,user_id:req.session.user_id  ......
 
+/home/dev/cloudpoker/client/src/components/hand.jsx
+    <span className="username">{this.props.player.playerName}</span>: <span className="stack">{this.props.player.chips}</span><Earnings earnings={this.props.player.earnings}/>
 
 /home/dev/cloudpoker/server/src/server-logic.js
     buyin(playerName, playerid, stack, isStraddling, seed) {
@@ -192,3 +198,44 @@ forever start -l webSvr.log --minUptime 5000 --spinSleepTime 2000 -aw .\server\s
 forever list
 forever stop 0
 forever start 0
+
+2021-01-12
+npm install express-session
+- redis db에 접속하기 위한 모듈
+npm install connect-redis
+
+
+
+
+/home/dev/cloudpoker/server/views/pages/game.ejs
+    <input type="text" id="txt_uid"             value="<%=user_id%>" style="width:80px;"/>
+    <input type="text" id="txt_isDealer"        value="" style="width:80px;"/>
+    <input type="text" id="txt_name"            value="<%=user_name%>" style="width:120px;"/>
+    chip:<input type="text" id="txt_chips"      value="0" style="width:80px;"/>
+    earn:<input type="text" id="txt_earnings"   value="0" style="width:80px;"/>
+    POT:<input type="text" id="txt_POT"         value="<%=user_POT%>"  style="width:80px;"/>
+/home/dev/cloudpoker/client/src/components/hand.jsx
+export class PlayerNameContainer extends Component {
+    render () {
+        if (!this.props.player) {
+            return null;
+        }
+        let className = "name";
+        if (this.props.player.isActionSeat && this.props.highlightActionSeat) {
+            className += " action";
+            // if(this.props.player.isDealer){
+            if(this.props.player.playerName=='U'+document.getElementById("txt_uid").value){
+                document.getElementById("txt_POT").value        = this.props.player.chips;
+                // document.getElementById("txt_isDealer").value   = this.props.player.isDealer;
+                document.getElementById("txt_chips").value      = this.props.player.chips; //2021-01-14
+                document.getElementById("txt_earnings").value   = this.props.player.earnings; //2021-01-14
+            }
+        }
+        return (
+            <div className={className}>
+                <DealerChip isDealer={this.props.player.isDealer}/>
+                <span className="username">{this.props.player.playerName}</span>: <span className="stack">{this.props.player.chips}</span><Earnings earnings={this.props.player.earnings}/>
+            </div>
+        );
+    }
+}
