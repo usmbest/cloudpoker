@@ -53,7 +53,7 @@ class PlayerRows extends Component {
             let playerid = `player${p.seat}`;
             let playerName = p.playerName;
             const handleStackChange = (e) => {this.handleStackInputChange(p.seat, e)};
-            const handleStackUpdateSubmit = (e) => {this.handleUpdateStackSubmit(p.seat, e)};
+            // const handleStackUpdateSubmit = (e) => {this.handleUpdateStackSubmit(p.seat, e)};
             const handleTransferHostClick = (e) => {this.transferHost(p.seat, e)};
             const handleKickPlayerClick = (e) => {this.kickPlayer(p.seat, e)};
             rows.push((
@@ -64,8 +64,8 @@ class PlayerRows extends Component {
                     </div>
                     <div className="five columns">
                         <div className="update-stack-host">
-                            <input className="u-tq-width inp stack-input" type="number" name="stack-input" onChange={handleStackChange} value={this.state.playerStacks[p.seat].chips}/>
-                            <input className="button-primary update-stack-row" type="submit" value="Update Stack" onClick={handleStackUpdateSubmit}/>
+                            <input className="u-tq-width inp stack-input" type="number" name="stack-input" onChange={handleStackChange} value={this.state.playerStacks[p.seat].chips} readOnly />
+                            {/* <input className="button-primary update-stack-row" type="submit" value="Update Stack" onClick={handleStackUpdateSubmit}/> */}
                         </div>
                     </div>
                     <div className="four columns">

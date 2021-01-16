@@ -260,7 +260,21 @@ class SessionManager extends TableManager {
             seat: super.getPlayerSeat(playerName),
             action: action,
             amount: ogBetAmount || betAmount,
-        })
+        });
+        //#region 2017-01-17 ############################
+        // if(parseInt(ogBetAmount || betAmount)>0 || action=='check')
+        // {
+        //     var conn = db_config.init(); //2020-09-13
+        //     db_config.connect(conn);
+        //     var sql2 = " update users set POT=POT - "+parseInt(ogBetAmount || betAmount)+" where id="+playerName.replace('U','')+" ";
+        //     var params = [];
+        //     conn.query(sql2, params, function(err, rows2, fields2){
+        //         if(err){ console.log(err);} else { console.log(sql2+' ok ');}
+        //     });
+        //     await sleep(1000);
+        // }
+        // console.log('/server/src/routes/session.js 264: '+playerName+':'+ogBetAmount || betAmount);
+        //#endregion 2017-01-17 ############################
     }
 
     getPublicInfo() {
@@ -478,7 +492,7 @@ class SessionManager extends TableManager {
     async addToGameLog(logEvent, args, emittedArgs) {
         this.io.emit(logEvent, emittedArgs || args);
         //...Object.entries(args || {}).flat() --> [].concat(...Object.entries(args || {}))
-        console.log('/server/src/routes/session.js [addToGameLog] ');
+        // console.log('/server/src/routes/session.js 482 [addToGameLog] ');
         //await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, ...Object.entries(args || {}).flat()); // org
         await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, [].concat(...Object.entries(args || {}))); // 1st
         //await addToGameLog(this.sid, this.table.game? this.table.game.id: 'none', logEvent, [].concat.apply([], ...Object.entries(args || {}))); // 2dn
@@ -489,18 +503,38 @@ class SessionManager extends TableManager {
         // if at showdown or everyone folded
         if (this.table.game.winners.length > 0) {
             this.sendTableState();
+            var conn = db_config.init();//2020-09-13
+            db_config.connect(conn);
+            var winplayerName = "";
             for (let winnerData of this.table.game.winners) {
                 // TODO: use multi (redis) and message-batch (gameLog.jsx) to make this somewhat atomic.
                 await this.addToGameLog('log-winner', winnerData);
+                // console.log('#### /server/src/routes/session.js 512 [check_round-winnerData] find winnerData - '+winnerData.playerName+' /amount:'+winnerData.amount+' /chips:'+winnerData.chips+' /seat:'+winnerData.seat);
+                //#region ################## MYSQL winner save ##################
+                winplayerName = winnerData.playerName;
+                var sql2 = " update users set POT="+winnerData.chips+" where id="+winnerData.playerName.replace('U','')+" ";
+                var params = [];
+                conn.query(sql2, params, function(err, rows2, fields2){
+                    if(err){ console.log(err);} else { console.log(sql2+' ok ');}
+                });
+                await sleep(200);
+                //#endregion################## MYSQL winner save ##################
             }
+            await sleep(2000);
+            //#region ################## MYSQL loser save ##################
+            // for (let p of this.table.allPlayers) {
+            //     if (p === null) { continue; }
+            //     if(winplayerName!=p.playerName){ console.log('#### session.js 530 - loserplayerName : '+p.playerName+' /chips:'+p.chips+' /seat:'+p.seat);}
+            // }
+            //#endregion################## MYSQL loser save ##################
 
-            await sleep(3000);
             // handle losers
             let losers = super.getLosers();
             for (let i = 0; i < losers.length; i++){
+                console.log('#### /server/src/routes/session.js 523 [check_round-losers] - '+losers[i].playerName+' /chips:'+losers[i].chips);
                 await this.handlePlayerExit(losers[i].playerName);
             }
-
+            await sleep(1000);
             // start new round
             await this.startNextRoundOrWaitingForPlayers();
         }
@@ -540,6 +574,7 @@ class SessionManager extends TableManager {
         let canPerformAction = actualBetAmount >= 0;
 
         if (canPerformAction) {
+            // console.log('#### /server/src/routes/session.js 578 [performAction] - '+playerName+' /amount:'+amount);
             this.tableExpiryTimer.refresh();
             await this.emitAction(action, playerName, actualBetAmount, true, amount);
             // shift action to next player in hand
@@ -734,7 +769,7 @@ async function handleOnAuth(s, socket) {
             return;
         }
         const playersInNextHand = s.playersInNextHand().length;
-        console.log(`players in next hand: ${playersInNextHand}`);
+        // console.log(`players in next hand: ${playersInNextHand}`);
         s.startNextRoundOrWaitingForPlayers();
     });
 
@@ -750,6 +785,7 @@ async function handleOnAuth(s, socket) {
         }
         p.showHand();
         s.sendTableState();
+        // console.log("/server/src/routes/session.js 754 :show-hand ");
     });
 
     const setSeedSchema = Joi.object({
@@ -836,6 +872,7 @@ async function handleOnAuth(s, socket) {
         if (!pName || pName === 'guest'){
             console.log('player at seat ' + data.seat + ' doesnt exist');
         } else {
+            console.log('/server/src/routes/session.js 876:update-player-stack');
             if (!newStack || isNaN(newStack) || newStack <= 0){
                 console.log('error with newStackAmountInput');
             } else {
