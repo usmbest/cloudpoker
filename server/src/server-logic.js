@@ -71,7 +71,7 @@ class TableStateManager {
 
     getLosers() {
         let losers = this.table.getLosers();
-        console.log('/home/dev/cloudpoker/server/src/server-logic.js  losers!');
+        // console.log('/home/dev/cloudpoker/server/src/server-logic.js  losers!');
         console.log(losers);
         return losers;
     }
