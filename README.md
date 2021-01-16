@@ -263,3 +263,9 @@ forever start -l webSvr.log --minUptime 5000 --spinSleepTime 2000 -a .\server\sr
 forever list
 forever stop 0
 forever start 0
+
+
+docker exec -it redis-container redis-cli FLUSHALL
+
+cd D:\WWW\cloudpoker
+node .\server\src\index.js
