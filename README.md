@@ -81,10 +81,7 @@ yarn add dotenv
 
 ---------------------------------------------------------------------------------------------------------
 cd ~/cloudpoker/client
-npm i webpack@4.44.2 webpack-cli@3.3.12 html-webpack-plugin webpack-dev-server path --save-dev
-
-yarn build
----------------------------
+npm i webpack@4.44.2 web---------------------------
 docker exec -it dingrr redis-cli FLUSHALL
 cd ~/cloudpoker/client
 yarn build
@@ -254,3 +251,11 @@ docker exec -it dingrr redis-cli -v
 
 /home/dev/cloudpoker/server/src/routes/session.js
 console.log('/server/src/routes/session.js 497 [check_round] find winnerData - '+winnerData.playerName+' /amount:'+winnerData.amount+' /chips:'+winnerData.chips+' /seat:'+winnerData.seat);
+gs --> [].concat(...args)
+
+cd D:\WWW\cloudpoker
+d:
+forever start -l webSvr.log --minUptime 5000 --spinSleepTime 2000 -a .\server\src\index.js
+forever list
+forever stop 0
+forever start 0
