@@ -30,7 +30,18 @@ export class PlayerNameContainer extends Component {
             return null;
         }
         let className = "name";
-        if (this.props.player.isActionSeat && this.props.highlightActionSeat) className += " action";
+        if (this.props.player.isActionSeat && this.props.highlightActionSeat) {
+            className += " action";
+            // if(this.props.player.isDealer){
+            // if(this.props.player.playerName=='U'+document.getElementById("txt_uid").value){
+            //     document.getElementById("txt_POT").value        = this.props.player.chips;
+            //     document.getElementById("txt_isWinner").value   = "mytrun";
+            //     document.getElementById("txt_chips").value      = this.props.player.chips; //2021-01-14
+            //     document.getElementById("txt_earnings").value   = this.props.player.earnings; //2021-01-14
+            // }else{
+            //     document.getElementById("txt_isWinner").value   = "wait";
+            // }
+        }
         return (
             <div className={className}>
                 <DealerChip isDealer={this.props.player.isDealer}/>

@@ -71,7 +71,7 @@ class TableStateManager {
 
     getLosers() {
         let losers = this.table.getLosers();
-        console.log('losers!');
+        // console.log('/home/dev/cloudpoker/server/src/server-logic.js  losers!');
         console.log(losers);
         return losers;
     }
@@ -425,6 +425,8 @@ class TableManager extends TableStateManager {
                 name: playerName,
                 stack: amount
             };
+            console.log("######################### /server/src/server-logic.js #########################");
+            console.log("playerName:"+playerName + " stack:"+amount); //2021-01-16
             this.playerStacksNextHand.push(obj);
         }
     }

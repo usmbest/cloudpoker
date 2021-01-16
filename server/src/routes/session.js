@@ -813,7 +813,7 @@ async function handleOnAuth(s, socket) {
         if (!s.gameInProgress) {
             console.log('game hasn\'t started yet');
         } else if (s.actionSeat === s.getPlayerSeat(playerName)) {
-            console.log('action data', JSON.stringify(data));
+            // console.log('action data', JSON.stringify(data));
             await s.performAction(playerName, data.action, data.amount);
         } else {
             console.log(`not ${playerName}'s action`);

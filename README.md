@@ -81,7 +81,11 @@ yarn add dotenv
 
 ---------------------------------------------------------------------------------------------------------
 cd ~/cloudpoker/client
-npm i webpack@4.44.2 web---------------------------
+npm i webpack@4.44.2 web
+docker exec -it dingrr redis-cli FLUSHALL
+cd ~/cloudpoker/client
+yarn build
+---------------------------
 docker exec -it dingrr redis-cli FLUSHALL
 cd ~/cloudpoker/client
 yarn build
