@@ -166,7 +166,7 @@ const getGameState = async (sid, gameId) => {
 }
 const setRngState = (multi, table, sid) => {
     if (table.game) {
-        console.log('/server/src/redisHelpers.js 169Line [setRngState] ');
+        // console.log('/server/src/redisHelpers.js 169Line [setRngState] ');
         let state = table.initialRngState;
         let args = [
             'type', 'rngState',
@@ -184,7 +184,7 @@ const setInitialPlayerStates = (multi, table, sid) => {
     // sort of hacky. delete the previous stream. only has an effect if gameId === 'none'
     // (because other game IDs are unique UUIDs)
     multi.del(fmtGameStreamId(sid, gameId));
-    console.log('/server/src/redisHelpers.js [setInitialPlayerStates] ');
+    // console.log('/server/src/redisHelpers.js [setInitialPlayerStates] ');
     for (let p of table.allPlayers) {
         if (p===null) continue;
         let args = addPlayerArgs(table, sid, p);
@@ -270,14 +270,14 @@ async function deletePlayerOnRedis(sid, playerName) {
 module.exports.deletePlayerOnRedis = deletePlayerOnRedis;
 
 async function addToGameLog(sid, gameId, logEvent, ...args) {
-    console.log('/server/src/redisHelpers.js [addToGameLog] sid : ' + sid);
+    // console.log('/server/src/redisHelpers.js [addToGameLog] sid : ' + sid);
     // let xaddArgs = ['type', 'log', 'logEvent', logEvent, ...args]; //org
     let xaddArgs = ['type', 'log', 'logEvent', logEvent, [].concat(...args).join()]; //1st
     // await xaddAsync(fmtGameStreamId(sid, gameId), '*', ...xaddArgs); //org
     try{
         await xaddAsync((fmtGameStreamId(sid, gameId), '*', [].concat(...xaddArgs)).join()); //1st
     }catch(e){
-        console.log('/server/src/redisHelpers.js [addToGameLog catch] e : ' + e);
+        // console.log('/server/src/redisHelpers.js [addToGameLog catch] e : ' + e);
     }
     TableLogger.log(sid, [logEvent, ...args]); //org
     // TableLogger.log(sid, [logEvent, [].concat(...args).join()]); //1st

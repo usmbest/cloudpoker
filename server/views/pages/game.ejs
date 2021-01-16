@@ -40,6 +40,12 @@
             <div id="below-table-root"></div>
         </div>
     </div>
+    <input type="text" id="txt_uid"             value="<%=user_id%>" style="width:80px;"/>
+    <input type="text" id="txt_isWinner"        value="" style="width:80px;"/>
+    <input type="text" id="txt_name"            value="<%=user_name%>" style="width:120px;"/>
+    chip:<input type="text" id="txt_chips"      value="0" style="width:80px;"/>
+    earn:<input type="text" id="txt_earnings"   value="0" style="width:80px;"/>
+    POT:<input type="text" id="txt_POT"         value="<%=user_POT%>"  style="width:80px;"/>
     <script>
         window.onload = function () 
         {
@@ -54,7 +60,7 @@
             }
             // console.log('/server/views/pages/game.ejs : jsfn_bind_user()');
         }
-    </script>
+    </script>    
     <script src="../client/dist/game.bundle.js"></script>
 </body>
 

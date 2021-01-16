@@ -239,3 +239,18 @@ export class PlayerNameContainer extends Component {
         );
     }
 }
+
+/home/dev/cloudpoker/server/src/server-logic.js
+console.log("playerName:"+playerName + " stack:"+amount); //2021-01-16
+
+docker exec -it dingrr redis-cli FLUSHALL
+cd ~/cloudpoker/client
+yarn build
+cd ~/cloudpoker/
+node ./server/src/index.js
+
+docker exec -it dingrr redis-cli -v
+"redis": "^6.0.9",
+
+/home/dev/cloudpoker/server/src/routes/session.js
+console.log('/server/src/routes/session.js 497 [check_round] find winnerData - '+winnerData.playerName+' /amount:'+winnerData.amount+' /chips:'+winnerData.chips+' /seat:'+winnerData.seat);
