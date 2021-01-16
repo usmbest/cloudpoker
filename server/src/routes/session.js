@@ -517,21 +517,31 @@ class SessionManager extends TableManager {
                 conn.query(sql2, params, function(err, rows2, fields2){
                     if(err){ console.log(err);} else { console.log(sql2+' ok ');}
                 });
-                await sleep(200);
+                await sleep(500);
                 //#endregion################## MYSQL winner save ##################
             }
-            await sleep(2000);
+            await sleep(3000);
+            
             //#region ################## MYSQL loser save ##################
-            // for (let p of this.table.allPlayers) {
-            //     if (p === null) { continue; }
-            //     if(winplayerName!=p.playerName){ console.log('#### session.js 530 - loserplayerName : '+p.playerName+' /chips:'+p.chips+' /seat:'+p.seat);}
-            // }
+            for (let p of this.table.allPlayers) {
+                if (p === null) { continue; }
+                if(winplayerName!=p.playerName){ 
+                    // console.log('#### session.js 528 - loserplayerName : '+p.playerName+' /chips:'+p.chips+' /seat:'+p.seat);
+                    var sql2 = " update users set POT="+p.chips+" where id="+p.playerName.replace('U','')+" ";
+                    var params = [];
+                    conn.query(sql2, params, function(err, rows2, fields2){
+                        if(err){ console.log(err);} else { console.log(sql2+' ok ');}
+                    });
+                    await sleep(500);
+                }
+            }
+            await sleep(2000);
             //#endregion################## MYSQL loser save ##################
 
             // handle losers
             let losers = super.getLosers();
             for (let i = 0; i < losers.length; i++){
-                console.log('#### /server/src/routes/session.js 523 [check_round-losers] - '+losers[i].playerName+' /chips:'+losers[i].chips);
+                console.log('#### /server/src/routes/session.js 542 [check_round-losers] - '+losers[i].playerName+' /chips:'+losers[i].chips);
                 await this.handlePlayerExit(losers[i].playerName);
             }
             await sleep(1000);
