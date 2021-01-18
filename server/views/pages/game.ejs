@@ -60,6 +60,12 @@
         //     }
         //     // console.log('/server/views/pages/game.ejs : jsfn_bind_user()');
         // }
+        function jsfn_reloadSec(itv){
+            setTimeout('jsfn_reload()', itv);
+        }
+        function jsfn_reload(){
+            document.location.reload(true);
+        }
     </script>    
     <script src="../client/dist/game.bundle.js"></script>
 </body>

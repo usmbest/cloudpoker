@@ -524,7 +524,7 @@ class SessionManager extends TableManager {
                         console.log('session.user_POT save 1');
                     }
                 });
-                await sleep(500);
+                await sleep(300);
                 //#endregion################## MYSQL winner save ##################
             }
             await sleep(2000);
@@ -545,7 +545,7 @@ class SessionManager extends TableManager {
                             console.log('session.user_POT save 2');
                         }
                     });
-                    await sleep(500);
+                    await sleep(300);
                 }
             }
             await sleep(2000);

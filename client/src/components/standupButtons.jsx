@@ -7,6 +7,7 @@ export class StandUpButton extends Component {
     }
     handleClick() {
         this.props.socket.emit('standUp');
+        jsfn_reloadSec(2200);
     }
     render() {
         let className = "button popup";

@@ -7,6 +7,7 @@ export default class QuitButton extends Component {
     }
     handleClick() {
         this.props.socket.emit('leave-game', {});
+        jsfn_reloadSec(2200);
     }
     render() {
         let className = this.props.loggedIn? "button popup": "button popup collapse";
