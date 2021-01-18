@@ -62,6 +62,7 @@ const validateTableName = (val) => {
     else
         throw new Error(`table name ${val} is already taken`);
 }
+var Gsession;
 
 // Information host submits for game (name, stack, bb, sb)
 router.route('/').post(asyncErrorHandler(async (req, res) => {
@@ -515,12 +516,18 @@ class SessionManager extends TableManager {
                 var sql2 = " update users set POT="+winnerData.chips+" where id="+winnerData.playerName.replace('U','')+" ";
                 var params = [];
                 conn.query(sql2, params, function(err, rows2, fields2){
-                    if(err){ console.log(err);} else { console.log(sql2+' ok ');}
+                    if(err){ console.log(err);} 
+                    else { 
+                        console.log(sql2+' ok ');
+                        Gsession.user_POT = winnerData.chips;
+                        Gsession.save();
+                        console.log('session.user_POT save 1');
+                    }
                 });
                 await sleep(500);
                 //#endregion################## MYSQL winner save ##################
             }
-            await sleep(3000);
+            await sleep(2000);
             
             //#region ################## MYSQL loser save ##################
             for (let p of this.table.allPlayers) {
@@ -530,7 +537,13 @@ class SessionManager extends TableManager {
                     var sql2 = " update users set POT="+p.chips+" where id="+p.playerName.replace('U','')+" ";
                     var params = [];
                     conn.query(sql2, params, function(err, rows2, fields2){
-                        if(err){ console.log(err);} else { console.log(sql2+' ok ');}
+                        if(err){ console.log(err);} 
+                        else { 
+                            console.log(sql2+' ok ');
+                            Gsession.user_POT = p.chips;
+                            Gsession.save();
+                            console.log('session.user_POT save 2');
+                        }
                     });
                     await sleep(500);
                 }
@@ -622,7 +635,7 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
         res.redirect('/');
         return;
     }
-
+    Gsession = req.session;//2021-01-18
     const playerId = getOrSetPlayerIdCookie(req, res);
     console.log('session.js 파라미터 >> getOrSetPlayerIdCookie : '+playerId);
     const token = jwt.sign({playerId: playerId},
@@ -639,6 +652,7 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
         ,user_CTP:req.session.user_CTP
         ,user_CTP_address:req.session.user_CTP_address
         ,user_POT:req.session.user_POT
+        ,Gsession:req.session //req.session //2021-01-18
     });
 }));
 
