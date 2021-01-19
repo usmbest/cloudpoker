@@ -621,13 +621,25 @@ class SessionManager extends TableManager {
 }
 
 router.route('/:id').get(asyncErrorHandler((req, res) => {
+    let sid = req.params.id;
+    console.log('session.js sid : '+sid);
     console.log('session.js 파라미터 >> session.user_id : '+req.session.user_id);
+    
     if (req.session.user_id=="" || req.session.user_id === undefined ){
+        res.cookie('pre_sid', sid, { maxAge: 180000   /*180 000밀리초 → 180초 → 3Minute*/ });        
         res.sendFile(STATIC_PATH + '/ulogin.html');
         return;
     }
+    //shared link로 들어왔다면 로그인 후 최초 링크 주소로 보내기 위하여 2021-01-19
+    else {
+        if(req.cookies.pre_sid=="" || req.cookies.pre_sid===undefined){
+        }else{
+            sid = req.cookies.pre_sid;
+            console.log('################ cookies sid : '+sid+' ################');
+            res.cookie('pre_sid', "");
+        }
+    }
 
-    let sid = req.params.id;
     const s = sessionManagers.get(sid);
     console.log('session.js 파라미터 >> req.params.id : '+req.params.id);
 
