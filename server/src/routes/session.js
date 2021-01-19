@@ -622,8 +622,8 @@ class SessionManager extends TableManager {
 
 router.route('/:id').get(asyncErrorHandler((req, res) => {
     let sid = req.params.id;
-    console.log('session.js sid : '+sid);
-    console.log('session.js 파라미터 >> session.user_id : '+req.session.user_id);
+    // console.log('session.js sid : '+sid);
+    // console.log('session.js 파라미터 >> session.user_id : '+req.session.user_id);
     
     if (req.session.user_id=="" || req.session.user_id === undefined ){
         res.cookie('pre_sid', sid, { maxAge: 180000   /*180 000밀리초 → 180초 → 3Minute*/ });        
@@ -635,7 +635,7 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
         if(req.cookies.pre_sid=="" || req.cookies.pre_sid===undefined){
         }else{
             sid = req.cookies.pre_sid;
-            console.log('################ cookies sid : '+sid+' ################');
+            // console.log('################ cookies sid : '+sid+' ################');
             res.cookie('pre_sid', ""); // diff url 
             // res.redirect('/session/'+sid); //최초 링크대로 전달 bug fix
             res.redirect('/session/'+sid); //최초 링크대로 전달 bug fix
@@ -643,7 +643,7 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
     }
 
     const s = sessionManagers.get(sid);
-    console.log('session.js 파라미터 >> sid : '+sid);
+    // console.log('session.js 파라미터 >> sid : '+sid);
 
     if (!s) { // redirect user to login page if the request's table ID does not exist
         res.redirect('/');
@@ -651,7 +651,7 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
     }
     Gsession = req.session;//2021-01-18
     const playerId = getOrSetPlayerIdCookie(req, res);
-    console.log('session.js 파라미터 >> getOrSetPlayerIdCookie : '+playerId);
+    // console.log('session.js 파라미터 >> getOrSetPlayerIdCookie : '+playerId);
     const token = jwt.sign({playerId: playerId},
         process.env.PKR_JWT_SECRET, {expiresIn: "2 days"});
     res.render('pages/game', {
