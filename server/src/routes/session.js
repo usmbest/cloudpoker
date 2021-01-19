@@ -636,12 +636,14 @@ router.route('/:id').get(asyncErrorHandler((req, res) => {
         }else{
             sid = req.cookies.pre_sid;
             console.log('################ cookies sid : '+sid+' ################');
-            res.cookie('pre_sid', "");
+            res.cookie('pre_sid', ""); // diff url 
+            // res.redirect('/session/'+sid); //최초 링크대로 전달 bug fix
+            res.redirect('/session/'+sid); //최초 링크대로 전달 bug fix
         }
     }
 
     const s = sessionManagers.get(sid);
-    console.log('session.js 파라미터 >> req.params.id : '+req.params.id);
+    console.log('session.js 파라미터 >> sid : '+sid);
 
     if (!s) { // redirect user to login page if the request's table ID does not exist
         res.redirect('/');
