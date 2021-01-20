@@ -524,10 +524,10 @@ class SessionManager extends TableManager {
                         console.log('session.user_POT save 1');
                     }
                 });
-                await sleep(300);
+                await sleep(100);
                 //#endregion################## MYSQL winner save ##################
             }
-            await sleep(2000);
+            await sleep(1000);
             
             //#region ################## MYSQL loser save ##################
             for (let p of this.table.allPlayers) {
@@ -545,10 +545,10 @@ class SessionManager extends TableManager {
                             console.log('session.user_POT save 2');
                         }
                     });
-                    await sleep(300);
+                    await sleep(100);
                 }
             }
-            await sleep(2000);
+            await sleep(500);
             //#endregion################## MYSQL loser save ##################
 
             // handle losers
@@ -557,7 +557,7 @@ class SessionManager extends TableManager {
                 console.log('#### /server/src/routes/session.js 542 [check_round-losers] - '+losers[i].playerName+' /chips:'+losers[i].chips);
                 await this.handlePlayerExit(losers[i].playerName);
             }
-            await sleep(1000);
+            await sleep(800);
             // start new round
             await this.startNextRoundOrWaitingForPlayers();
         }

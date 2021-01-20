@@ -256,6 +256,13 @@ docker exec -it dingrr redis-cli -v
 /home/dev/cloudpoker/server/src/routes/session.js
 console.log('/server/src/routes/session.js 497 [check_round] find winnerData - '+winnerData.playerName+' /amount:'+winnerData.amount+' /chips:'+winnerData.chips+' /seat:'+winnerData.seat);
 gs --> [].concat(...args)
+check_round
+
+/home/dev/cloudpoker/client/src/components/quitButton.jsx
+/home/dev/cloudpoker/client/src/components/standupButtons.jsx
+jsfn_reloadSec(2200);
+
+
 
 cd D:\WWW\cloudpoker
 d:
