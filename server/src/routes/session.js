@@ -121,6 +121,22 @@ router.route('/').post(asyncErrorHandler(async (req, res) => {
     await initializeTableRedis(table, value.tableName);
 
     await res.json(value);
+    //#region ############# 게임 생성 목록 저장 start #############
+    var conn = db_config.init(); //2020-09-13
+    db_config.connect(conn);
+
+    var sql3 = "";  // sql3 -- board list 
+    sql3 = sql3 + " INSERT INTO `board` (`name`,`title`,`content`,`passwd`,`hit`)";
+    sql3 = sql3 + " VALUES ('"+value.tableName+"','"+value.tableName+"','OPEN LIST','wow1',0); ";
+    var params = [];
+    conn.query(sql3, params, function(err, rows2, fields2){
+        if(err){ console.log(err);} 
+        else { 
+            console.log(sql3+' ok ');
+        }
+    });
+    await sleep(100);
+    //#endregion ############# 게임 생성 목록 저장 end #############
     console.log(`starting new table with id: ${value.tableName} with mod player id ${playerId}`);
 }));
 

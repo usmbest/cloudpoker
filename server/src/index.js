@@ -232,6 +232,9 @@ app.post('/ulogin', function (req, res) {
 const sessionRouter = require('./routes/session');
 app.use('/session', sessionRouter);
 
+//handling board
+const boardRouter = require('./routes/list');
+app.use('/list', boardRouter);
 
 // Starts the server.
 server.listen(port, function () {
