@@ -276,3 +276,18 @@ docker exec -it redis-container redis-cli FLUSHALL
 
 cd D:\WWW\cloudpoker
 node .\server\src\index.js
+
+
+
+
+CREATE TABLE `board` (
+  `idx` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `regdate` datetime NOT NULL,
+  `modidate` datetime NOT NULL,
+  `passwd` varchar(50) NOT NULL,
+  `hit` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`idx`)
+);
