@@ -1,5 +1,5 @@
 # cloudpoker
-
+[poker.citypay.org](poker.citypay.org) clone and modify  
 [cloudpoker.io](https://cloudpoker.io) is a fully functional poker server built on React and Node.js with Socket.io.
 
 
